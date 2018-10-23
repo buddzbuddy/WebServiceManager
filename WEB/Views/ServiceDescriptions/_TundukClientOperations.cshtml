@@ -1,0 +1,44 @@
+﻿@model WEB.Models.Entities.ServiceDescription
+<div class="row">
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Шаг 1.</h5>
+                <p class="card-text">Сгенерировать клиент</p>
+                @if (Model.ClientDetails.Count > 0)
+                {
+                    <div class="alert alert-success text-right">Выполнено (clientId: <span id="clientId">@Model.ClientDetails.First().Id</span> <a href="javascript://" onclick="copyToClipboard('clientId')"><i class="fas fa-copy"></i></a>) @Html.ActionLink("Удалить", "DeleteClientDetails", "ServiceDescriptions", new { id = Model.ClientDetails.First().Id }, new { id = "deleteClientDetailsBtn", @class = "btn btn-danger" })</div>
+                    Html.RenderAction("ClientDetails", new { detailsId = Model.ClientDetails.First().Id });
+                }
+                else
+                {
+                    <div class="alert alert-dark text-right">@Html.ActionLink("Выполнить", "CreateClientDetails", "ServiceDescriptions", new { serviceId = Model.Id }, new { id = "createClientDetailsBtn", @class = "btn btn-primary" })</div>
+                }
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Шаг 2.</h5>
+                <p class="card-text">Опубликовать на сервер</p>
+                @if (Model.ClientDetails.Count > 0)
+                {
+                <div class="alert alert-dark text-right">@Html.ActionLink("Выполнить", "PublishClientDetails", "ServiceDescriptions", new { serviceId = Model.Id }, new { id = "publishClientDetailsBtn", @class = "btn btn-primary disabled" })</div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">InputParams:</h5>
+                <p class="card-text inputParams text-center"><img width="150" height="150" src="~/Content/processing.gif" /></p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Output params</h5>
+                <p class="card-text outputParams text-center"><img width="150" height="150" src="~/Content/processing.gif" /></p>
+            </div>
+        </div>
+    </div>
+</div>

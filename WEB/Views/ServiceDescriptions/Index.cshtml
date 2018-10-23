@@ -1,0 +1,95 @@
+﻿@model IEnumerable<WEB.Models.Entities.ServiceDescription>
+
+@{
+    ViewBag.Title = "Веб-сервисы";
+}
+<p>
+    @Html.ActionLink("Создать соединение", "Create", null, new { @class = "btn btn-default" })
+</p>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Список существующих подключений
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>@Html.DisplayNameFor(model => model.Name)</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.AgreementNo)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ConnectionType)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.InteractionType)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.IsActive)
+                        </th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.AgreementNo)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ConnectionType)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.InteractionType)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.IsActive)
+                        </th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.ActionLink("Открыть", "Details", new { id = item.Id }, new { @class = "btn btn-default" })
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AgreementNo)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ConnectionType)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.InteractionType)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.IsActive)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+</div>
+
+@section scripts
+{
+    <!-- Page level plugin JavaScript-->
+    <script src="~/dark_theme/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="~/dark_theme/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <!-- Demo scripts for this page-->
+    <script src="~/dark_theme/js/demo/datatables-demo.js"></script>
+}

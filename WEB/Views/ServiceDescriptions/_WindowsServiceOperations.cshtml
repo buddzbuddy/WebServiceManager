@@ -1,0 +1,24 @@
+﻿@model WEB.Models.Entities.ServiceDescription
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table">
+            <tr>
+                <td>@Html.ActionLink("Создание файлов и папок для сервиса", "CreateProjectFolder", "ServiceBuilder", new { name = Model.Name }, new { id = "createProjectFolderBtn", @class = "btn btn-default" })</td>
+                <td class="hasProjectFolder"></td>
+            </tr>
+            <tr>
+                <td>@Html.ActionLink("Построить сервис из проекта", "BuildProject", "ServiceBuilder", new { name = Model.Name }, new { id = "buildProjectBtn", @class = "btn btn-default" })</td>
+                <td>@Html.ActionLink("Перестроить сервис", "RebuildProject", "ServiceBuilder", new { name = Model.Name }, new { id = "rebuildProjectBtn", @class = "btn btn-default" })</td>
+            </tr>
+            <tr>
+                <td>@Html.ActionLink("Установить сервис на сервер", "InstallService", "ServiceBuilder", new { name = Model.Name }, new { id = "installServiceBtn", @class = "btn btn-default" })</td>
+                <td>@Html.ActionLink("Удалить установку", "UninstallService", "ServiceBuilder", new { name = Model.Name }, new { id = "uninstallServiceBtn", @class = "btn btn-default" })</td>
+            </tr>
+            <tr>
+                <td>@Html.ActionLink("Запустить", "StartService", "ServiceBuilder", new { name = Model.Name }, new { id = "startServiceBtn", @class = "btn btn-default" })</td>
+                <td>@Html.ActionLink("Остановить", "StopService", "ServiceBuilder", new { name = Model.Name }, new { id = "stopServiceBtn", @class = "btn btn-default" })</td>
+            </tr>
+        </table>
+    </div>
+</div>

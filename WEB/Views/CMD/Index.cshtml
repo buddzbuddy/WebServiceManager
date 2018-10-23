@@ -1,0 +1,31 @@
+﻿
+@{
+    ViewBag.Title = "CMD";
+}
+
+<h2>Check CMD</h2>
+
+@using (Html.BeginForm())
+{
+    <textarea cols="150" rows="10" name="command">@ViewBag.Command</textarea>
+    <button type="submit">Submit!</button>
+}
+
+<div style="background-color:#1c2544;color:white;padding:10px;">
+    <h6>terminal</h6>
+    @if (ViewBag.OutputLines != null)
+    {
+        <p>The following OutputLines was detected:</p>
+        <ul>
+            @foreach (var line in ViewBag.OutputLines)
+            {
+                <li>@line</li>
+            }
+        </ul>
+    }
+    @if (ViewBag.Error != null)
+    {
+        <p>The following error was detected:</p>
+        <p>@ViewBag.Error</p>
+    }
+</div>

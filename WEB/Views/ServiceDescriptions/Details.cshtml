@@ -1,0 +1,416 @@
+﻿@model WEB.Models.Entities.ServiceDescription
+
+@{
+    ViewBag.Title = "Просмотр подключения";
+}
+<p></p>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="tab_1-tab" data-toggle="tab" href="#tab_1" role="tab" aria-controls="tab_1" aria-selected="true">Просмотр подключения</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab_2-tab" data-toggle="tab" href="#tab_2" role="tab" aria-controls="tab_2" aria-selected="false">Доступные функции</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab_3-tab" data-toggle="tab" href="#tab_3" role="tab" aria-controls="tab_3" aria-selected="false">Terminal</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent" style="padding: 5px;">
+    <div class="tab-pane fade show active" id="tab_1" role="tabpanel" aria-labelledby="tab_1-tab">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.AgreementNo)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.AgreementNo)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ConnectionType)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.ConnectionType)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.InteractionType)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.InteractionType)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.IsActive)
+            </dd>
+
+        </dl>
+        <p>
+            @Html.ActionLink("Редактировать (restricted)", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" }) |
+            @Html.ActionLink("Удалить (restricted)", "Delete", new { id = Model.Id }, new { @class = "btn btn-danger" }) |
+            @Html.ActionLink("Назад к списку", "Index")
+        </p>
+    </div>
+    <div class="tab-pane fade" id="tab_2" role="tabpanel" aria-labelledby="tab_2-tab">
+        @if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Internet && Model.InteractionType == WEB.Models.Enums.InteractionType.Transmit)
+        {
+            Html.RenderPartial("_WindowsServiceOperations", Model);
+        }
+        else if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Internet && Model.InteractionType == WEB.Models.Enums.InteractionType.Receive)
+        {
+            Html.RenderPartial("_WindowsClientOperations", Model);
+        }
+        else if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Tunduk && Model.InteractionType == WEB.Models.Enums.InteractionType.Transmit)
+        {
+            Html.RenderPartial("_TundukServiceOperations", Model);
+        }
+        else if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Tunduk && Model.InteractionType == WEB.Models.Enums.InteractionType.Receive)
+        {
+            Html.RenderPartial("_TundukClientOperations", Model);
+        }
+    </div>
+    <div class="tab-pane fade" id="tab_3" role="tabpanel" aria-labelledby="tab_3-tab">
+        <div class="col-md-6 terminal">
+            <p>terminal >_</p>
+            <ul></ul>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    @if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Internet)
+    {
+        if (Model.InteractionType == WEB.Models.Enums.InteractionType.Transmit)
+        {
+            <script>
+                $(function () {
+
+                    $.ajax({
+                        url: '@Url.Action("GetWinServiceInfo", "ServiceBuilder", new { name = Model.Name })',
+                        success: function (result) {
+                            if (result.result) {
+
+                                if (result.isStarted) {
+                                    $('#startServiceBtn').attr('disabled', 'disabled');
+                                }
+                                else {
+                                    $('#stopServiceBtn').attr('disabled', 'disabled');
+                                }
+
+                                if (result.isExist) {
+                                    $('#installServiceBtn').attr('disabled', 'disabled');
+                                }
+                                else {
+                                    $('#uninstallServiceBtn').attr('disabled', 'disabled');
+                                    $('#startServiceBtn').attr('disabled', 'disabled');
+                                    $('#stopServiceBtn').attr('disabled', 'disabled');
+                                }
+                            }
+                            else {
+                                $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+                            }
+
+                            $.ajax({
+                                url: '@Url.Action("HasBuilding", "ServiceBuilder", new { name = Model.Name })',
+                                success: function (result) {
+                                    if (result.result) {
+                                        $('#buildProjectBtn').attr('disabled', 'disabled');
+                                        $('#rebuildProjectBtn').removeAttr('disabled');
+                                    }
+                                    else {
+                                        $('#installServiceBtn').attr('disabled', 'disabled');
+                                        $('#uninstallServiceBtn').attr('disabled', 'disabled');
+                                        $('#startServiceBtn').attr('disabled', 'disabled');
+                                        $('#stopServiceBtn').attr('disabled', 'disabled');
+                                    }
+
+                                    $.ajax({
+                                        url: '@Url.Action("CheckProjectFolder", "ServiceBuilder", new { name = Model.Name })',
+                                        success: function (result) {
+                                            if (result.result) {
+                                                $('#createProjectFolderBtn').attr('disabled', 'disabled');
+                                                $('.hasProjectFolder').text('Создано').addClass('text-success');
+                                            }
+                                            else {
+                                                $('#buildProjectBtn').attr('disabled', 'disabled');
+                                                $('#rebuildProjectBtn').attr('disabled', 'disabled');
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+
+                    $(document).delegate('#createProjectFolderBtn', 'click', function (e) {
+                        e.preventDefault();
+                        var url = $(this).attr('href');
+                        $.ajax({
+                            url: url,
+                            success: function (result) {
+                                if (result.result) {
+                                    $(result.outputLines).each(function (i, item) {
+                                        $('.terminal ul').append($('<li/>').text(item));
+                                    });
+                                }
+                                else {
+                                    $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                }
+                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+                            }
+                        });
+                    });
+
+                    $(document).delegate('#buildProjectBtn', 'click', function (e) {
+                        e.preventDefault();
+                        var url = $(this).attr('href');
+                        $.ajax({
+                            url: url,
+                            success: function (result) {
+                                if (result.result) {
+                                    $(result.outputLines).each(function (i, item) {
+                                        $('.terminal ul').append($('<li/>').text(item));
+                                    });
+                                }
+                                else {
+                                    $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                }
+                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+                            }
+                        });
+                    });
+                    $(document).delegate('#rebuildProjectBtn', 'click', function (e) {
+                        e.preventDefault();
+                        var url = $(this).attr('href');
+                        $.ajax({
+                            url: url,
+                            success: function (result) {
+                                if (result.result) {
+                                    $(result.outputLines).each(function (i, item) {
+                                        $('.terminal ul').append($('<li/>').text(item));
+                                    });
+                                }
+                                else {
+                                    $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                }
+                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+                            }
+                        });
+                    });
+
+
+                    $(document).delegate('#installServiceBtn', 'click', function (e) {
+                        e.preventDefault();
+                        var url = $(this).attr('href');
+                        $.ajax({
+                            url: url,
+                            success: function (result) {
+                                if (result.result) {
+                                    $(result.outputLines).each(function (i, item) {
+                                        $('.terminal ul').append($('<li/>').text(item));
+                                    });
+                                }
+                                else {
+                                    $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                }
+                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+                            }
+                        });
+                    });
+                    $(document).delegate('#uninstallServiceBtn', 'click', function (e) {
+                        e.preventDefault();
+                        var url = $(this).attr('href');
+                        $.ajax({
+                            url: url,
+                            success: function (result) {
+                                if (result.result) {
+                                    $(result.outputLines).each(function (i, item) {
+                                        $('.terminal ul').append($('<li/>').text(item));
+                                    });
+                                }
+                                else {
+                                    $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                }
+                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+                            }
+                        });
+                    });
+
+
+                    $(document).delegate('#startServiceBtn', 'click', function (e) {
+                        e.preventDefault();
+                        var url = $(this).attr('href');
+                        $.ajax({
+                            url: url,
+                            success: function (result) {
+                                if (result.result) {
+                                    $(result.outputLines).each(function (i, item) {
+                                        $('.terminal ul').append($('<li/>').text(item));
+                                    });
+                                }
+                                else {
+                                    $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                }
+                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+                            }
+                        });
+                    });
+                    $(document).delegate('#stopServiceBtn', 'click', function (e) {
+                        e.preventDefault();
+                        var url = $(this).attr('href');
+                        $.ajax({
+                            url: url,
+                            success: function (result) {
+                                if (result.result) {
+                                    $(result.outputLines).each(function (i, item) {
+                                        $('.terminal ul').append($('<li/>').text(item));
+                                    });
+                                }
+                                else {
+                                    $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                }
+                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+                            }
+                        });
+                    });
+                });
+            </script>
+        }
+        else
+        {
+            <script>
+
+            </script>
+        }
+    }
+    else
+    {
+        if (Model.InteractionType == WEB.Models.Enums.InteractionType.Transmit)
+        {
+            <script>
+                $(function () {
+                    $.ajax({
+                        url: '@Url.Action("CheckProjectFolder", "ServiceBuilder", new { name = Model.Name })',
+                        success: function (result) {
+                            if (result.result) {
+                                $('#createProjectFolderBtn').addClass('disabled').attr('href', '#');
+                                $('.hasProjectFolder').text('Создано').addClass('text-success');
+                                $.ajax({
+                                    url: '@Url.Action("IsPublished", "ServiceBuilder", new { name = Model.Name })',
+                                    success: function (result) {
+                                        if (result.result) {
+                                            $('#publishToPackageBtn').addClass('disabled').attr('href', '#');
+                                            $('.isPublished').text('Опубликовано @("Tunduk" + Model.Name + ".zip")').addClass('text-success');
+
+                                            $.ajax({
+                                                url: '@Url.Action("IsDeployed", "ServiceBuilder", new { name = Model.Name })',
+                                                success: function (result) {
+                                                    if (result.result) {
+                                                        var url = result.serviceUrl.replace('localhost', '192.168.2.104');
+                                                        var link = $('<a/>');
+                                                        link.addClass('btn btn-link').text('открыть').attr('href', url).attr('target', '_blank');
+                                                        $('.isDeployed').text('Установлен ').addClass('text-success').append(link);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                            else {
+                                $('#publishToPackageBtn').addClass('disabled').attr('href', '#');
+                            }
+                        }
+                    });
+                    $(document).delegate('#createProjectFolderBtn, #publishToPackageBtn, #checkDeployBtn, #deployBtn', 'click', function (e) {
+                        e.preventDefault();
+                        var url = $(this).attr('href');
+                        $.ajax({
+                            url: url,
+                            success: function (result) {
+                                if (result.result) {
+                                    $(result.outputLines).each(function (i, item) {
+                                        $('.terminal ul').append($('<li/>').text(item));
+                                    });
+                                }
+                                else {
+                                    $(result.outputLines).each(function (i, item) {
+                                        $('.terminal ul').append($('<li/>').text(item));
+                                    });
+                                    $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                }
+                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
+                            }
+                        });
+                    });
+
+                });
+            </script>
+        }
+        else
+        {
+            <script>
+                $(function () {
+                    @if(Model.ClientDetails.Count > 0)
+                    {
+                        var soapObj = Model.ClientDetails.First();
+                        <text>
+                            var url = '@Url.Action("GetRequiredParams", "SoapClient", new { wsdlUrl = soapObj.WsdlUrl, methodName = soapObj.MethodName })'.replace("&amp;", "&");
+                            $.getJSON(url, function (data) {
+                                if (data.result) {
+                                    setTimeout(function () {
+                                        var tmpl1 = $('<textarea id="inputParams" style="color:green;width: 100%;max-width:100%;height:300px"></textarea>');
+                                        $('.inputParams').html(tmpl1);
+                                        tmpl1.html(JSON.stringify(data.inputParams, undefined, 4));
+                                        setTimeout(function () {
+                                            var tmpl2 = $('<textarea id="outputParams" style="color:green;width: 100%;max-width:100%;height:300px"></textarea>');
+                                            $('.outputParams').html(tmpl2);
+                                            tmpl2.html(JSON.stringify(data.outputParams, undefined, 4));
+                                        }, 0);
+                                    }, 0);
+                                }
+                                else {
+                                    bs_alert(data.errorMessage);
+                                    $('.inputParams img').attr('src', '@Url.Content("~/Content/service-unavailable.png")').removeAttr('width').removeAttr('height');
+                                    $('.outputParams img').attr('src', '@Url.Content("~/Content/service-unavailable.png")').removeAttr('width').removeAttr('height');
+                                }
+                            });
+                        </text>
+                    }
+                });
+            </script>
+        }
+    }
+}
+
+@section styles {
+    <style>
+        .terminal {
+            background-color: #1c2544;
+            color: white;
+            padding: 10px;
+            overflow: scroll;
+            height: 300px;
+        }
+
+            .terminal .error {
+                color: red;
+                font-style: italic;
+            }
+    </style>
+}

@@ -1,0 +1,28 @@
+﻿
+@model WEB.Models.Entities.ServiceDescription
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table table-bordered">
+            <tr>
+                <td>@Html.ActionLink("Создать сервис по шаблону", "CreateProjectFolder", "ServiceBuilder", new { name = Model.Name, isTunduk = true }, new { id = "createProjectFolderBtn", @class = "btn btn-default" })</td>
+                <td class="hasProjectFolder"></td>
+            </tr>
+            <tr>
+                <td>@Html.ActionLink("Опубликовать пакет для развертывания", "PublishToPackage", "ServiceBuilder", new { name = Model.Name }, new { id = "publishToPackageBtn", @class = "btn btn-default" })</td>
+                <td class="isPublished"></td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.ActionLink("Проверка установки", "CheckDeploy", "ServiceBuilder", new { name = Model.Name }, new { id = "checkDeployBtn", @class = "btn btn-default" })
+                </td>
+                <td class="isDeployed" rowspan="2" align="center" style="vertical-align: middle"></td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.ActionLink("Установка на сервер", "Deploy", "ServiceBuilder", new { name = Model.Name }, new { id = "deployBtn", @class = "btn btn-default" })
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

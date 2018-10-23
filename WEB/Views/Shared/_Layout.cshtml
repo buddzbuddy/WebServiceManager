@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Конструктор веб-сервисов</title>
+    @*@Styles.Render("~/Content/css")*@
+    @Styles.Render(System.Web.Optimization.BundleTable.Bundles.ResolveBundleUrl("~/Content/css", true))
+    @Styles.Render("~/bs-datepicker/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+    @RenderSection("styles", required: false)
+    <style>
+        #bs-alert{
+            z-index:2000;
+            position:fixed;
+            margin:0px auto;
+            display:none;
+            left:35%;
+            right:35%;
+        }
+        @@media (min-width: 768px) {
+            .navbar-brand.abs {
+                position: absolute;
+                width: 100%;
+                left: 0;
+                text-align: center;
+            }
+        }
+}
+    </style>
+</head>
+<body style="padding: 0px !important;" data-spy="scroll" data-target="#myScrollspy" data-offset="20">
+    <div id="bs-alert" class="alert alert-danger">
+        <strong>Ошибка:</strong> <span id="bs-alert-message"></span>
+    </div>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark" data-toggle="affix">
+        <div class="mx-auto d-sm-flex d-block flex-sm-nowrap">
+            @Html.ActionLink("Service constructor", "Index", "Home", null, new { @class = "navbar-brand" })
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample11" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarsExample11">
+                <ul class="navbar-nav">
+                    <li class="nav-item@(ViewBag.ServiceDescriptions)">
+                        @Html.ActionLink("Services", "Index", "ServiceDescriptions", null, new { @class = "nav-link" })
+                    </li>
+                    <li class="nav-item@(ViewBag.NavManuals)">
+                        <a href="#" class="nav-link">Manuals</a>@*@Html.ActionLink("Manuals", "Index", "Manuals", null, new { @class = "nav-link" })*@
+                    </li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </nav>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Разработчик Intersoft</p>
+        </footer>
+    </div>
+        @Scripts.Render("~/bundles/jquery")
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+    @Scripts.Render(System.Web.Optimization.BundleTable.Bundles.ResolveBundleUrl("~/bundles/bootstrap", true))
+    @Scripts.Render("~/bs-datepicker/js")
+    @RenderSection("scripts", required: false)
+    <script>
+        function bs_alert(message) {
+            $('#bs-alert-message').html(message);
+            $('#bs-alert').fadeIn(300);
+            setTimeout(function () {
+                $('#bs-alert').fadeOut(300);
+            }, 25000);
+        }
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            $(".bs_datepicker").datepicker({
+                format: "dd.mm.yyyy",
+                language: "ru",
+                todayHighlight: true,
+                clearBtn: true
+            });
+        });
+    </script>
+</body>
+</html>

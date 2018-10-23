@@ -1,0 +1,361 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Text;
+using System.Web.Services.Description;
+using System.Net;
+namespace WEB.SOAP
+{
+    public static class WsdlParser
+    {
+        public static void ServiceDescriptionSpike(out WebServiceInfo webServiceInfo, string url)
+        {
+            //url = "http://10.1.4.33/wsdl?xRoadInstance=central-server&memberClass=GOV&memberCode=70000005&subsystemCode=passport-service&serviceCode=testPassportDataByPSN&version=v1";//"http://localhost/TundukFOMS2/wsdl/doc.wsdl";//
+
+            webServiceInfo = WebServiceInfo.OpenWsdl(new Uri(url));
+            //if(withConsole)
+            //{
+            //    Console.WriteLine(string.Format("WebService: {0}", webServiceInfo.Url));
+
+            //    foreach (WebMethodInfo method in webServiceInfo.WebMethods)
+            //    {
+            //        Console.WriteLine(string.Format("\tWebMethod: {0}", method.Name));
+            //        Console.WriteLine("\t\tInput Parameters");
+            //        ShowInConsole(method.InputParameters);
+
+            //        Console.WriteLine("\t\tOutput Parameters");
+
+            //        ShowInConsole(method.OutputParameters);
+            //    }
+            //}
+        }
+        static string MultipleTab(int count)
+        {
+            string t = "\t";
+            for(int i = 0; i < count; i++)
+            {
+                t += "\t";
+            }
+            return t;
+        }
+        static void ShowInConsole(Parameter[] parameters, int count = 3)
+        {
+            foreach (Parameter parameter in parameters)
+            {
+                Console.WriteLine(string.Format("{0}{1} {2}", MultipleTab(count), parameter.Name, parameter.Type));
+                ShowInConsole(parameter.Children.ToArray(), count + 1);
+            }
+        }
+    }
+    /// <summary>
+    /// Information about a web service
+    /// </summary>
+    public class WebServiceInfo
+    {
+        WebMethodInfoCollection _webMethods = new WebMethodInfoCollection();
+        Uri _url;
+        static Dictionary<string, WebServiceInfo> _webServiceInfos =
+            new Dictionary<string, WebServiceInfo>();
+
+        /// <summary>
+        /// Constructor creates the web service info from the given url.
+        /// </summary>
+        /// <param name="url">
+        private WebServiceInfo(Uri url)
+        {
+            if (url == null)
+                throw new ArgumentNullException("url");
+            _url = url;
+            _webMethods = GetWebServiceDescription(url);
+        }
+
+        /// <summary>
+        /// Factory method for WebServiceInfo. Maintains a hashtable WebServiceInfo objects
+        /// keyed by url in order to cache previously accessed wsdl files.
+        /// </summary>
+        /// <param name="url">
+        /// <returns></returns>
+        public static WebServiceInfo OpenWsdl(Uri url)
+        {
+            WebServiceInfo webServiceInfo;
+            if (!_webServiceInfos.TryGetValue(url.ToString(), out webServiceInfo))
+            {
+                webServiceInfo = new WebServiceInfo(url);
+                _webServiceInfos.Add(url.ToString(), webServiceInfo);
+            }
+            return webServiceInfo;
+        }
+
+        /// <summary>
+        /// Convenience overload that takes a string url
+        /// </summary>
+        /// <param name="url">
+        /// <returns></returns>
+        public static WebServiceInfo OpenWsdl(string url)
+        {
+            Uri uri = new Uri(url);
+            return OpenWsdl(uri);
+        }
+
+        /// <summary>
+        /// Load the WSDL file from the given url.
+        /// Use the ServiceDescription class to walk the wsdl and create the WebServiceInfo
+        /// instance.
+        /// </summary>
+        /// <param name="url">
+        private WebMethodInfoCollection GetWebServiceDescription(Uri url)
+        {
+            UriBuilder uriBuilder = new UriBuilder(url);
+            //uriBuilder.Query = "WSDL";
+
+            WebMethodInfoCollection webMethodInfos = new WebMethodInfoCollection();
+
+            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(uriBuilder.Uri);
+            webRequest.ContentType = "text/xml;charset=\"utf-8\"";
+            webRequest.Method = "GET";
+            webRequest.Accept = "text/xml";
+
+            ServiceDescription serviceDescription;
+
+            using (System.Net.WebResponse response = webRequest.GetResponse())
+            using (System.IO.Stream stream = response.GetResponseStream())
+            {
+                serviceDescription = ServiceDescription.Read(stream);
+            }
+            
+            foreach (PortType portType in serviceDescription.PortTypes)
+            {
+                foreach (Operation operation in portType.Operations)
+                {
+                    string operationName = operation.Name;
+                    string inputMessageName = operation.Messages.Input.Message.Name;
+                    string outputMessageName = operation.Messages.Output.Message.Name;
+
+                    // get the message part
+                    string inputMessagePartName =
+                        serviceDescription.Messages[inputMessageName].Parts[0].Element.Name;
+                    string outputMessagePartName =
+                        serviceDescription.Messages[outputMessageName].Parts[0].Element.Name;
+
+                    // get the parameter name and type
+                    Parameter[] inputParameters = GetParameters2(serviceDescription, inputMessagePartName);
+                    Parameter[] outputParameters = GetParameters2(serviceDescription, outputMessagePartName);
+
+                    WebMethodInfo webMethodInfo = new WebMethodInfo(
+                        operation.Name, inputParameters, outputParameters);
+                    webMethodInfos.Add(webMethodInfo);
+                }
+            }
+            return webMethodInfos;
+        }
+
+        /// <summary>
+        /// Walk the schema definition to find the parameters of the given message.
+        /// </summary>
+        /// <param name="serviceDescription">
+        /// <param name="messagePartName">
+        /// <returns></returns>
+        private static Parameter[] GetParameters_old(ServiceDescription serviceDescription, string messagePartName)
+        {
+            List<Parameter> parameters = new List<Parameter>();
+
+            Types types = serviceDescription.Types;
+            foreach(
+            System.Xml.Schema.XmlSchema xmlSchema in types.Schemas)
+            {
+                foreach (object item in xmlSchema.Items)
+                {
+                    System.Xml.Schema.XmlSchemaElement schemaElement = item as System.Xml.Schema.XmlSchemaElement;
+                    if (schemaElement != null)
+                    {
+                        if (schemaElement.Name == messagePartName)
+                        {
+                            System.Xml.Schema.XmlSchemaType schemaType = schemaElement.SchemaType;
+                            System.Xml.Schema.XmlSchemaComplexType complexType = schemaType as System.Xml.Schema.XmlSchemaComplexType;
+                            if (complexType != null)
+                            {
+                                System.Xml.Schema.XmlSchemaParticle particle = complexType.Particle;
+                                System.Xml.Schema.XmlSchemaSequence sequence = particle as System.Xml.Schema.XmlSchemaSequence;
+                                if (sequence != null)
+                                {
+                                    foreach (System.Xml.Schema.XmlSchemaElement childElement in sequence.Items)
+                                    {
+
+                                        string parameterName = childElement.Name;
+                                        string parameterType = childElement.SchemaTypeName.Name;
+                                        parameters.Add(new Parameter(parameterName, parameterType));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            
+            return parameters.ToArray();
+        }
+        private static Parameter[] GetParameters2(ServiceDescription serviceDescription, string messagePartName)
+        {
+            List<Parameter> parameters = new List<Parameter>();
+
+            Types types = serviceDescription.Types;
+            foreach (System.Xml.Schema.XmlSchema xmlSchema in types.Schemas)
+            {
+                foreach (object item in xmlSchema.Items)
+                {
+                    System.Xml.Schema.XmlSchemaElement schemaElement = item as System.Xml.Schema.XmlSchemaElement;
+                    InitElement(schemaElement, messagePartName, parameters);
+                }
+            }
+
+
+            return parameters.ToArray();
+        }
+
+        static void InitElement(System.Xml.Schema.XmlSchemaElement schemaElement, string messagePartName, List<Parameter> parameters, Parameter parent = null)
+        {
+            if (schemaElement != null)
+            {
+                if (schemaElement.Name == messagePartName)
+                {
+                    System.Xml.Schema.XmlSchemaType schemaType = schemaElement.SchemaType;
+                    System.Xml.Schema.XmlSchemaComplexType complexType = schemaType as System.Xml.Schema.XmlSchemaComplexType;
+                    if (complexType != null)
+                    {
+                        System.Xml.Schema.XmlSchemaParticle particle = complexType.Particle;
+                        System.Xml.Schema.XmlSchemaSequence sequence = particle as System.Xml.Schema.XmlSchemaSequence;
+                        if (sequence != null)
+                        {
+                            foreach (System.Xml.Schema.XmlSchemaElement childElement in sequence.Items)
+                            {
+
+                                string parameterName = childElement.Name;
+                                string parameterType = childElement.SchemaTypeName.Name;
+                                var parameter = new Parameter(parameterName, parameterType, parent);
+                                if (parent == null)
+                                    parameters.Add(parameter);
+                                InitElement(childElement, parameterName, parameters, parameter);
+                                if(!childElement.RefName.IsEmpty) Console.WriteLine(childElement.RefName.Name);
+                            }
+                        }
+                    }
+                }
+                if (!schemaElement.RefName.IsEmpty) Console.WriteLine(schemaElement.RefName.Name);
+            }
+        }
+
+        /// <summary>
+        /// WebMethodInfo
+        /// </summary>
+        public WebMethodInfoCollection WebMethods
+        {
+            get { return _webMethods; }
+        }
+
+        /// <summary>
+        /// Url
+        /// </summary>
+        public Uri Url
+        {
+            get { return _url; }
+            set { _url = value; }
+        }
+    }
+
+    /// <summary>
+    /// Information about a web service operation
+    /// </summary>
+    public class WebMethodInfo
+    {
+        string _name;
+        Parameter[] _inputParameters;
+        Parameter[] _outputParameters;
+
+        /// <summary>
+        /// OperationInfo
+        /// </summary>
+        public WebMethodInfo(string name, Parameter[] inputParameters, Parameter[] outputParameters)
+        {
+            _name = name;
+            _inputParameters = inputParameters;
+            _outputParameters = outputParameters;
+        }
+
+        /// <summary>
+        /// Name
+        /// </summary>
+        public string Name
+        {
+            get { return _name; }
+        }
+
+        /// <summary>
+        /// InputParameters
+        /// </summary>
+        public Parameter[] InputParameters
+        {
+            get { return _inputParameters; }
+        }
+
+        /// <summary>
+        /// OutputParameters
+        /// </summary>
+        public Parameter[] OutputParameters
+        {
+            get { return _outputParameters; }
+        }
+    }
+
+    /// <summary>
+    /// A collection of WebMethodInfo objects
+    /// </summary>
+    public class WebMethodInfoCollection : KeyedCollection<string, WebMethodInfo>
+    {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public WebMethodInfoCollection() : base() { }
+
+        protected override string GetKeyForItem(WebMethodInfo webMethodInfo)
+        {
+            return webMethodInfo.Name;
+        }
+    }
+
+    /// <summary>
+    /// represents a parameter (input or output) of a web method.
+    /// </summary>
+    public class Parameter
+    {
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="name">
+        /// <param name="type">
+        public Parameter(string name, string type, Parameter parent = null)
+        {
+            this.Name = name;
+            this.Type = type;
+            Children = new List<Parameter>();
+            if(parent != null)
+            {
+                parent.Children.Add(this);
+            }
+        }
+
+        /// <summary>
+        /// Name
+        /// </summary>
+        public string Name { get; set; }
+        /// <summary>
+        /// Type
+        /// </summary>
+        public string Type { get; set; }
+
+        /// <summary>
+        /// Children
+        /// </summary>
+        public List<Parameter> Children { get; set; }
+    }
+}

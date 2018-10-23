@@ -1,0 +1,26 @@
+﻿@model WEB.Models.Entities.ServiceDescription
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    @Html.ActionLink("Создать клиент по шаблону", "CreateProjectFolder", "ClientBuilder", new { name = Model.Name, isTunduk = true }, new { id = "createProjectFolderBtn", @class = "btn btn-default" })
+                </td>
+                <td class="hasProjectFolder"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>
