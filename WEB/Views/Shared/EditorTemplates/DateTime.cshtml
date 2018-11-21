@@ -1,0 +1,2 @@
+﻿@model DateTime?
+<input type="text" name="@Html.NameForModel()" id="@Html.IdForModel()" class="form-control bs_datepicker" autocomplete="off" value="@(Model.HasValue ? Model.Value.ToShortDateString() : "")" />

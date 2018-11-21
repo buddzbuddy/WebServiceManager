@@ -1,0 +1,47 @@
+﻿@model WEB.Models.Entities.ServiceDetail
+
+@{
+    ViewBag.Title = "Зарегистрировать Tunduk-адаптер";
+}
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.ServiceDescriptionId)
+        @Html.Hidden("SubsystemId", ViewBag.SubsystemId as int?)
+
+        <p>
+            Выбрана организация: @ViewBag.OrganizationName
+        </p>
+        <p>
+            Выбрана подсистема: @ViewBag.SubsystemName
+        </p>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ServiceCodeId, "ServiceCodeId", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("ServiceCodeId", null, "-", htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.ServiceCodeId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Сохранить" class="btn btn-outline-primary" />
+                @Html.ActionLink("Отмена", "Details", new { id = Model.ServiceDescriptionId }, new { @class = "btn btn-outline-secondary" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item">@Html.ActionLink("Список сервисов", "Index")</li>
+    <li class="breadcrumb-item">@Html.ActionLink("Просмотр подключения", "Details", new { id = Model.ServiceDescriptionId })</li>
+    <li class="breadcrumb-item active">@ViewBag.Title</li>
+}

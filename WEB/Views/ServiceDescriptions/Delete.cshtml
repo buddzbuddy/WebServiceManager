@@ -53,7 +53,8 @@
 
     </dl>
 
-    @using (Html.BeginForm()) {
+    @using (Html.BeginForm())
+    {
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
@@ -62,3 +63,8 @@
         </div>
     }
 </div>
+
+@section breadcrumb{
+    <li class="breadcrumb-item">@Html.ActionLink("Список сервисов", "Index")</li>
+    <li class="breadcrumb-item active">@ViewBag.Title</li>
+}

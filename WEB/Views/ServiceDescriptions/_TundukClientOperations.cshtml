@@ -16,16 +16,6 @@
                 }
             </div>
         </div>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Шаг 2.</h5>
-                <p class="card-text">Опубликовать на сервер</p>
-                @if (Model.ClientDetails.Count > 0)
-                {
-                <div class="alert alert-dark text-right">@Html.ActionLink("Выполнить", "PublishClientDetails", "ServiceDescriptions", new { serviceId = Model.Id }, new { id = "publishClientDetailsBtn", @class = "btn btn-primary disabled" })</div>
-                }
-            </div>
-        </div>
     </div>
     <div class="col-sm-6">
         <div class="card">

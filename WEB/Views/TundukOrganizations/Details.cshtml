@@ -1,0 +1,138 @@
+﻿@model WEB.Models.Entities.TundukOrganization
+
+@{
+    ViewBag.Title = "Просмотр организации";
+}
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MemberCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MemberCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.MemberClass)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.MemberClass)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.XRoadInstance)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.XRoadInstance)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    <a href="@Url.Action("Edit", new { id = Model.Id })"><i class="fa fa-edit"></i> Редактировать</a>
+</p>
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Subsystems
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            @Html.ActionLink("Добавить", "CreateSubsystem", new { tundukOrganizationId = Model.Id }, new { @class = "btn btn-outline-primary" })
+            <br /><br />
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="5">
+                            Subsystem
+                        </th>
+                        <th colspan="3">
+                            ServiceCode
+                        </th>
+                    </tr>
+                    <tr>
+                        <th colspan="2">
+                            @Html.DisplayNameFor(model => model.Subsystems.First().Name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Subsystems.First().TargetNamespace)
+                        </th>
+                        <th colspan="2">
+                            @Html.DisplayNameFor(model => model.Subsystems.First().ProtocolVersion)
+                        </th>
+                        <th colspan="2">
+                            @Html.DisplayNameFor(model => model.Subsystems.First().ServiceCodes.First().Name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Subsystems.First().ServiceCodes.First().Version)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var subsystem in Model.Subsystems)
+                    {
+                        <tr>
+                            <td rowspan="@(subsystem.ServiceCodes.Count > 0 ? subsystem.ServiceCodes.Count : 1)">
+                                <a href="@Url.Action("DeleteSubsystem", new { id = subsystem.Id })" title="Удалить" onclick="return confirm('Вы уверены что хотите удалить эту запись?');"><i class="fa fa-trash-alt"></i></a>
+                            </td>
+                            <td rowspan="@(subsystem.ServiceCodes.Count > 0 ? subsystem.ServiceCodes.Count : 1)">
+                                @Html.DisplayFor(model => subsystem.Name)
+                            </td>
+                            <td rowspan="@(subsystem.ServiceCodes.Count > 0 ? subsystem.ServiceCodes.Count : 1)">
+                                @Html.DisplayFor(model => subsystem.TargetNamespace)
+                            </td>
+                            <td rowspan="@(subsystem.ServiceCodes.Count > 0 ? subsystem.ServiceCodes.Count : 1)">
+                                @Html.DisplayFor(model => subsystem.ProtocolVersion)
+                            </td>
+                            <td rowspan="@(subsystem.ServiceCodes.Count > 0 ? subsystem.ServiceCodes.Count : 1)">
+                                <a href="@Url.Action("CreateServiceCode", new { subsystemId = subsystem.Id })" title="Добавить ServiceCode"><i class="fa fa-plus-circle"></i></a>
+                            </td>
+                            <td>
+                                @if (subsystem.ServiceCodes.FirstOrDefault() != null)
+                                {
+                                    <a href="@Url.Action("DeleteServiceCode", new { id = subsystem.ServiceCodes.FirstOrDefault().Id })" title="Удалить" onclick="return confirm('Вы уверены что хотите удалить эту запись?');"><i class="fa fa-trash-alt"></i></a>
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => subsystem.ServiceCodes.FirstOrDefault().Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => subsystem.ServiceCodes.FirstOrDefault().Version)
+                            </td>
+                        </tr>
+                        foreach (var serviceCode in subsystem.ServiceCodes.Skip(1))
+                        {
+                            <tr>
+                                <td>
+                                    <a href="@Url.Action("DeleteServiceCode", new { id = serviceCode.Id })" title="Удалить" onclick="return confirm('Вы уверены что хотите удалить эту запись?');"><i class="fa fa-trash-alt"></i></a>
+                                </td>
+                                <td>
+                                    @(Html.DisplayFor(model => serviceCode.Name))
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(model => serviceCode.Version)
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section breadcrumb{
+    <li class="breadcrumb-item">@Html.ActionLink("Справочник организаций Tunduk", "Index")</li>
+    <li class="breadcrumb-item active">@ViewBag.Title</li>
+}

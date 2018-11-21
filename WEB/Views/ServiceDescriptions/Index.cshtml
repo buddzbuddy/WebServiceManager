@@ -3,10 +3,6 @@
 @{
     ViewBag.Title = "Веб-сервисы";
 }
-<p>
-    @Html.ActionLink("Создать соединение", "Create", null, new { @class = "btn btn-default" })
-</p>
-
 <div class="card mb-3">
     <div class="card-header">
         <i class="fas fa-table"></i>
@@ -14,6 +10,8 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
+            @Html.ActionLink("Создать соединение", "Create", null, new { @class = "btn btn-outline-primary" })
+            <br /><br />
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
@@ -58,7 +56,7 @@
                     {
                         <tr>
                             <td>
-                                @Html.ActionLink("Открыть", "Details", new { id = item.Id }, new { @class = "btn btn-default" })
+                                @Html.ActionLink("Открыть", "Details", new { id = item.Id }, new { @class = "btn btn-outline-info" })
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Name)
@@ -93,3 +91,7 @@
     <!-- Demo scripts for this page-->
     <script src="~/dark_theme/js/demo/datatables-demo.js"></script>
 }
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">Список сервисов</li>
+    }

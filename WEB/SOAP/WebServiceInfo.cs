@@ -4,6 +4,9 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Web.Services.Description;
 using System.Net;
+using System.Xml.Schema;
+using System.IO;
+
 namespace WEB.SOAP
 {
     public static class WsdlParser
@@ -52,10 +55,9 @@ namespace WEB.SOAP
     /// </summary>
     public class WebServiceInfo
     {
-        WebMethodInfoCollection _webMethods = new WebMethodInfoCollection();
-        Uri _url;
-        static Dictionary<string, WebServiceInfo> _webServiceInfos =
-            new Dictionary<string, WebServiceInfo>();
+        static Dictionary<string, WebServiceInfo> _webServiceInfos = new Dictionary<string, WebServiceInfo>();
+        private static Types types;
+        private static string tns;
 
         /// <summary>
         /// Constructor creates the web service info from the given url.
@@ -63,10 +65,8 @@ namespace WEB.SOAP
         /// <param name="url">
         private WebServiceInfo(Uri url)
         {
-            if (url == null)
-                throw new ArgumentNullException("url");
-            _url = url;
-            _webMethods = GetWebServiceDescription(url);
+            Url = url ?? throw new ArgumentNullException("url");
+            WebMethods = GetWebServiceDescription(url);
         }
 
         /// <summary>
@@ -117,12 +117,12 @@ namespace WEB.SOAP
 
             ServiceDescription serviceDescription;
 
-            using (System.Net.WebResponse response = webRequest.GetResponse())
-            using (System.IO.Stream stream = response.GetResponseStream())
+            using (WebResponse response = webRequest.GetResponse())
+            using (Stream stream = response.GetResponseStream())
             {
                 serviceDescription = ServiceDescription.Read(stream);
             }
-            
+
             foreach (PortType portType in serviceDescription.PortTypes)
             {
                 foreach (Operation operation in portType.Operations)
@@ -132,17 +132,14 @@ namespace WEB.SOAP
                     string outputMessageName = operation.Messages.Output.Message.Name;
 
                     // get the message part
-                    string inputMessagePartName =
-                        serviceDescription.Messages[inputMessageName].Parts[0].Element.Name;
-                    string outputMessagePartName =
-                        serviceDescription.Messages[outputMessageName].Parts[0].Element.Name;
+                    string inputMessagePartName = serviceDescription.Messages[inputMessageName].Parts[0].Element.Name;
+                    string outputMessagePartName = serviceDescription.Messages[outputMessageName].Parts[0].Element.Name;
 
                     // get the parameter name and type
-                    Parameter[] inputParameters = GetParameters2(serviceDescription, inputMessagePartName);
-                    Parameter[] outputParameters = GetParameters2(serviceDescription, outputMessagePartName);
+                    Parameter[] inputParameters = GetParameters(serviceDescription, inputMessagePartName);
+                    Parameter[] outputParameters = GetParameters(serviceDescription, outputMessagePartName);
 
-                    WebMethodInfo webMethodInfo = new WebMethodInfo(
-                        operation.Name, inputParameters, outputParameters);
+                    WebMethodInfo webMethodInfo = new WebMethodInfo(operation.Name, inputParameters, outputParameters);
                     webMethodInfos.Add(webMethodInfo);
                 }
             }
@@ -155,56 +152,17 @@ namespace WEB.SOAP
         /// <param name="serviceDescription">
         /// <param name="messagePartName">
         /// <returns></returns>
-        private static Parameter[] GetParameters_old(ServiceDescription serviceDescription, string messagePartName)
+        private static Parameter[] GetParameters(ServiceDescription serviceDescription, string messagePartName)
         {
             List<Parameter> parameters = new List<Parameter>();
 
-            Types types = serviceDescription.Types;
-            foreach(
-            System.Xml.Schema.XmlSchema xmlSchema in types.Schemas)
+            types = serviceDescription.Types;
+            tns = serviceDescription.TargetNamespace;
+            foreach (XmlSchema xmlSchema in types.Schemas)
             {
-                foreach (object item in xmlSchema.Items)
+                foreach (var item in xmlSchema.Items)
                 {
-                    System.Xml.Schema.XmlSchemaElement schemaElement = item as System.Xml.Schema.XmlSchemaElement;
-                    if (schemaElement != null)
-                    {
-                        if (schemaElement.Name == messagePartName)
-                        {
-                            System.Xml.Schema.XmlSchemaType schemaType = schemaElement.SchemaType;
-                            System.Xml.Schema.XmlSchemaComplexType complexType = schemaType as System.Xml.Schema.XmlSchemaComplexType;
-                            if (complexType != null)
-                            {
-                                System.Xml.Schema.XmlSchemaParticle particle = complexType.Particle;
-                                System.Xml.Schema.XmlSchemaSequence sequence = particle as System.Xml.Schema.XmlSchemaSequence;
-                                if (sequence != null)
-                                {
-                                    foreach (System.Xml.Schema.XmlSchemaElement childElement in sequence.Items)
-                                    {
-
-                                        string parameterName = childElement.Name;
-                                        string parameterType = childElement.SchemaTypeName.Name;
-                                        parameters.Add(new Parameter(parameterName, parameterType));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            
-            return parameters.ToArray();
-        }
-        private static Parameter[] GetParameters2(ServiceDescription serviceDescription, string messagePartName)
-        {
-            List<Parameter> parameters = new List<Parameter>();
-
-            Types types = serviceDescription.Types;
-            foreach (System.Xml.Schema.XmlSchema xmlSchema in types.Schemas)
-            {
-                foreach (object item in xmlSchema.Items)
-                {
-                    System.Xml.Schema.XmlSchemaElement schemaElement = item as System.Xml.Schema.XmlSchemaElement;
+                    XmlSchemaElement schemaElement = item as XmlSchemaElement;
                     InitElement(schemaElement, messagePartName, parameters);
                 }
             }
@@ -213,54 +171,105 @@ namespace WEB.SOAP
             return parameters.ToArray();
         }
 
-        static void InitElement(System.Xml.Schema.XmlSchemaElement schemaElement, string messagePartName, List<Parameter> parameters, Parameter parent = null)
+        static void InitElement(XmlSchemaElement schemaElement, string messagePartName, List<Parameter> parameters, Parameter parent = null)
         {
             if (schemaElement != null)
             {
                 if (schemaElement.Name == messagePartName)
                 {
-                    System.Xml.Schema.XmlSchemaType schemaType = schemaElement.SchemaType;
-                    System.Xml.Schema.XmlSchemaComplexType complexType = schemaType as System.Xml.Schema.XmlSchemaComplexType;
-                    if (complexType != null)
+                    if (schemaElement.SchemaType is XmlSchemaComplexType complexType)
                     {
-                        System.Xml.Schema.XmlSchemaParticle particle = complexType.Particle;
-                        System.Xml.Schema.XmlSchemaSequence sequence = particle as System.Xml.Schema.XmlSchemaSequence;
-                        if (sequence != null)
+                        XmlSchemaParticle particle = complexType.Particle;
+                        if (particle is XmlSchemaSequence sequence)
                         {
-                            foreach (System.Xml.Schema.XmlSchemaElement childElement in sequence.Items)
+                            foreach (var childObj in sequence.Items)
                             {
+                                XmlSchemaElement childElement = null;
+                                if (childObj is XmlSchemaChoice)
+                                {
+                                    childElement = (XmlSchemaElement)((XmlSchemaChoice)childObj).Items[0];
+                                }
+                                else
+                                {
+                                    childElement = (XmlSchemaElement)childObj;
+                                }
 
                                 string parameterName = childElement.Name;
                                 string parameterType = childElement.SchemaTypeName.Name;
+
                                 var parameter = new Parameter(parameterName, parameterType, parent);
                                 if (parent == null)
                                     parameters.Add(parameter);
-                                InitElement(childElement, parameterName, parameters, parameter);
-                                if(!childElement.RefName.IsEmpty) Console.WriteLine(childElement.RefName.Name);
+
+                                if (childElement.SchemaTypeName.Namespace == tns)
+                                {
+                                    var obj = types.Schemas.Find(childElement.SchemaTypeName, typeof(XmlSchemaComplexType));
+                                    if (obj != null && obj is XmlSchemaComplexType childComplexType)
+                                    {
+                                        InitComplexType(complexType, parameterName, parameters, parameter);
+                                    }
+                                    else
+                                        throw new ApplicationException(string.Format("ComplexType not found. childElement: {0}, childElement.SchemaTypeName: {1}", childElement.Name, childElement.SchemaTypeName));
+                                }
+                                else
+                                {
+                                    InitElement(childElement, parameterName, parameters, parameter);
+                                }
                             }
                         }
                     }
                 }
-                if (!schemaElement.RefName.IsEmpty) Console.WriteLine(schemaElement.RefName.Name);
+            }
+        }
+
+        static void InitComplexType(XmlSchemaComplexType complexType, string messagePartName, List<Parameter> parameters, Parameter parent = null)
+        {
+            XmlSchemaParticle particle = complexType.Particle;
+            if (particle is XmlSchemaSequence sequence)
+            {
+                foreach (var childObj in sequence.Items)
+                {
+                    XmlSchemaElement childElement = null;
+                    if (childObj is XmlSchemaChoice)
+                    {
+                        childElement = (XmlSchemaElement)((XmlSchemaChoice)childObj).Items[0];
+                    }
+                    else
+                    {
+                        childElement = (XmlSchemaElement)childObj;
+                    }
+
+                    string parameterName = childElement.Name;
+                    string parameterType = childElement.SchemaTypeName.Name;
+
+                    if (childElement.SchemaTypeName.Namespace == tns)
+                    {
+                        var obj = types.Schemas.Find(childElement.SchemaTypeName, typeof(XmlSchemaComplexType));
+                        if (obj != null && obj is XmlSchemaComplexType childComplexType)
+                        {
+                            InitComplexType(childComplexType, parameterName, parameters, parent);
+                        }
+                        else
+                            throw new ApplicationException(string.Format("ComplexType not found. childElement: {0}, childElement.SchemaTypeName: {1}", childElement.Name, childElement.SchemaTypeName));
+                    }
+                    else
+                    {
+                        var parameter = new Parameter(parameterName, parameterType, parent);
+                        InitElement(childElement, parameterName, parameters, parameter);
+                    }
+                }
             }
         }
 
         /// <summary>
         /// WebMethodInfo
         /// </summary>
-        public WebMethodInfoCollection WebMethods
-        {
-            get { return _webMethods; }
-        }
+        public WebMethodInfoCollection WebMethods { get; } = new WebMethodInfoCollection();
 
         /// <summary>
         /// Url
         /// </summary>
-        public Uri Url
-        {
-            get { return _url; }
-            set { _url = value; }
-        }
+        public Uri Url { get; set; }
     }
 
     /// <summary>

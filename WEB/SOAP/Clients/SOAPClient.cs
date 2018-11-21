@@ -115,7 +115,7 @@ namespace WEB.SOAP.Clients
             {
                 if (paramList.ContainsKey(p.Name))
                 {
-                    var newXmlSoapParam = document.CreateElement(p.Name, tns);
+                    var newXmlSoapParam = document.CreateElement(p.Name);
                     if (p.Children.Count > 0)
                     {
                         if(paramList[p.Name] is Dictionary<string, object>)
@@ -147,7 +147,7 @@ namespace WEB.SOAP.Clients
 
                 HttpWebRequest request = CreateWebRequest(serviceUrl);
                 
-                var soap_request_xml = SerializeToXmlDocument(soap_request, tns);
+                var soap_request_xml = SerializeToXmlDocument(soap_request);
 
                 foreach (var webMethod in webServiceInfo.WebMethods.Where(x => x.Name == methodName))
                 {
@@ -161,7 +161,7 @@ namespace WEB.SOAP.Clients
                 {
                     soap_request_xml.Save(stream);
                     //soap_request_xml.Save("D:\\soap_request.xml");
-                    XmlSerializer serializer = new XmlSerializer(typeof(SOAPEnvelope), tns);
+                    XmlSerializer serializer = new XmlSerializer(typeof(SOAPEnvelope));
                     using (WebResponse response = request.GetResponse())
                     {
                         using (StreamReader rd = new StreamReader(response.GetResponseStream()))
@@ -179,7 +179,7 @@ namespace WEB.SOAP.Clients
                 return false;
             }
         }
-        public static XmlDocument SerializeToXmlDocument(object input, string targetNamespace)
+        public static XmlDocument SerializeToXmlDocument(object input)
         {
             XmlSerializer ser = new XmlSerializer(input.GetType());
 

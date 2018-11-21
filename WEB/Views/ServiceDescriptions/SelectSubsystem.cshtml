@@ -1,0 +1,58 @@
+﻿@model IEnumerable<WEB.Models.Entities.Subsystem>
+
+@{
+    ViewBag.Title = "Выберите подсистему организации";
+}
+<p>
+    Выбрана организация: @ViewBag.OrganizationName
+</p>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        @ViewBag.Title
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <th></th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TargetNamespace)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ProtocolVersion)
+                    </th>
+                </tr>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.ActionLink("Выбрать", "SelectSubsystem", new { serviceId = ViewBag.serviceId, id = item.Id, item.TundukOrganizationId, returnAction = ViewBag.returnAction }, new { @class = "btn btn-outline-primary" })
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TargetNamespace)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProtocolVersion)
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        </div>
+    </div>
+</div>
+
+@section breadcrumb{
+    <li class="breadcrumb-item">@Html.ActionLink("Список сервисов", "Index")</li>
+    <li class="breadcrumb-item">@Html.ActionLink("Просмотр подключения", "Details", new { id = ViewBag.serviceId })</li>
+    <li class="breadcrumb-item active">@ViewBag.Title</li>
+}

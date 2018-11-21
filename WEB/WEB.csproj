@@ -194,21 +194,30 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ReceiveMonitorController.cs" />
+    <Compile Include="Controllers\ReportsController.cs" />
     <Compile Include="Controllers\ServiceBuilderController.cs" />
     <Compile Include="Controllers\ServiceDescriptionsController.cs" />
     <Compile Include="Controllers\SoapClientController.cs" />
+    <Compile Include="Controllers\TundukOrganizationsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Entities\ServiceCode.cs" />
+    <Compile Include="Models\Entities\ServiceDetail.cs" />
     <Compile Include="Models\Entities\ClientDetail.cs" />
+    <Compile Include="Models\Entities\HistoryItemBase.cs" />
     <Compile Include="Models\Entities\ReceiveHistoryItem.cs" />
     <Compile Include="Models\Entities\ServiceDescription.cs" />
+    <Compile Include="Models\Entities\Subsystem.cs" />
+    <Compile Include="Models\Entities\TransmitHistoryItem.cs" />
+    <Compile Include="Models\Entities\TundukOrganization.cs" />
     <Compile Include="Models\Enums\ConnectionType.cs" />
     <Compile Include="Models\Enums\EnumUtil.cs" />
     <Compile Include="Models\Enums\InteractionType.cs" />
     <Compile Include="Models\DbContext.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ReportViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SOAP\Clients\SOAPClient.cs" />
     <Compile Include="SOAP\WebServiceInfo.cs" />
@@ -1953,7 +1962,11 @@
     <Content Include="c3-0.6.8\htdocs\data\c3_test_3.json" />
     <Content Include="c3-0.6.8\htdocs\data\c3_test_ts.csv" />
     <Content Include="c3-0.6.8\htdocs\js\extensions" />
+    <Content Include="Docs\Manual.pdf" />
+    <Content Include="Docs\PublishManual.pdf" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
+    <Content Include="html_to_xls\js\FileSaver.min.js" />
+    <Content Include="html_to_xls\js\xlsx.core.min.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -2004,8 +2017,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
     <Content Include="Views\Account\ConfirmEmail.cshtml" />
@@ -2039,8 +2050,6 @@
     <Content Include="Views\ServiceDescriptions\_WindowsClientOperations.cshtml" />
     <Content Include="Views\Shared\_Layout-old.cshtml" />
     <Content Include="Views\Shared\_Layout-dark.cshtml" />
-    <Content Include="Views\ServiceDescriptions\CreateClientDetails.cshtml" />
-    <Content Include="Views\ServiceDescriptions\ClientDetails.cshtml" />
     <Content Include="Views\ReceiveMonitor\Index.cshtml" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
@@ -2053,6 +2062,28 @@
     <Content Include="Scripts\popper.js.map" />
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
+    <Content Include="Views\ServiceDescriptions\_LineChart.cshtml" />
+    <Content Include="Views\ServiceDescriptions\ServiceDetails.cshtml" />
+    <Content Include="Views\Reports\RequestByType.cshtml" />
+    <Content Include="Views\Reports\Index.cshtml" />
+    <Content Include="Views\Reports\RequestByPeriod.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\DateTime.cshtml" />
+    <Content Include="Views\Reports\RequestByOrg.cshtml" />
+    <Content Include="Views\TundukOrganizations\Create.cshtml" />
+    <Content Include="Views\TundukOrganizations\Delete.cshtml" />
+    <Content Include="Views\TundukOrganizations\Details.cshtml" />
+    <Content Include="Views\TundukOrganizations\Edit.cshtml" />
+    <Content Include="Views\TundukOrganizations\Index.cshtml" />
+    <Content Include="Views\Shared\_LayoutLogin.cshtml" />
+    <Content Include="Views\Account\LoginDark.cshtml" />
+    <Content Include="Views\Shared\_LoginPartialDark.cshtml" />
+    <Content Include="Views\TundukOrganizations\CreateSubsystem.cshtml" />
+    <Content Include="Views\TundukOrganizations\CreateServiceCode.cshtml" />
+    <Content Include="Views\ServiceDescriptions\CreateClientDetails.cshtml" />
+    <Content Include="Views\ServiceDescriptions\SelectTundukOrganization.cshtml" />
+    <Content Include="Views\ServiceDescriptions\SelectSubsystem.cshtml" />
+    <Content Include="Views\ServiceDescriptions\ClientDetails.cshtml" />
+    <Content Include="Views\ServiceDescriptions\CreateServiceDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

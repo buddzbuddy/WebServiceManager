@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace WEB.Controllers
 {
+    [Authorize]
     public class ServiceBuilderController : Controller
     {
         public ActionResult CreateProjectFolder(string name, bool isTunduk = false)

@@ -1,0 +1,105 @@
+﻿@model WEB.Models.Entities.ServiceCode
+
+@{
+    ViewBag.Title = "Добавить ServiceCode";
+}
+
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(model => model.Subsystem.TundukOrganization.Name)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Subsystem.TundukOrganization.Name)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Subsystem.TundukOrganization.MemberCode)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Subsystem.TundukOrganization.MemberCode)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Subsystem.TundukOrganization.MemberClass)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Subsystem.TundukOrganization.MemberClass)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Subsystem.TundukOrganization.XRoadInstance)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Subsystem.TundukOrganization.XRoadInstance)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Subsystem.Name)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Subsystem.Name)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Subsystem.TargetNamespace)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Subsystem.TargetNamespace)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.Subsystem.ProtocolVersion)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.Subsystem.ProtocolVersion)
+    </dd>
+</dl>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.SubsystemId)
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Version, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Version, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Version, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Сохранить" class="btn btn-outline-primary" />
+                @Html.ActionLink("Отмена", "Details", new { id = Model.Subsystem.TundukOrganizationId }, new { @class = "btn btn-outline-secondary" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item">@Html.ActionLink("Справочник организаций Tunduk", "Index")</li>
+    <li class="breadcrumb-item">@Html.ActionLink("Просмотр организации", "Details", new { id = Model.Subsystem.TundukOrganizationId })</li>
+    <li class="breadcrumb-item active">@ViewBag.Title</li>
+}

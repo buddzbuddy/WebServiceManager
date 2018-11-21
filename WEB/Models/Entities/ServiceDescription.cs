@@ -30,5 +30,6 @@ namespace WEB.Models.Entities
         public bool IsActive { get; set; }
 
         public virtual ICollection<ClientDetail> ClientDetails { get; set; }
+        public virtual ICollection<ServiceDetail> ServiceDetails { get; set; }
     }
 }

@@ -2,6 +2,8 @@
 
 @{
     ViewBag.Title = "Просмотр подключения";
+    ViewBag.ConnectionType = Model.InteractionType;
+    ViewBag.Name = Model.Name;
 }
 <p></p>
 <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -12,7 +14,10 @@
         <a class="nav-link" id="tab_2-tab" data-toggle="tab" href="#tab_2" role="tab" aria-controls="tab_2" aria-selected="false">Доступные функции</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" id="tab_3-tab" data-toggle="tab" href="#tab_3" role="tab" aria-controls="tab_3" aria-selected="false">Terminal</a>
+        <a class="nav-link" id="tab_3-tab" data-toggle="tab" href="#tab_3" role="tab" aria-controls="tab_3" aria-selected="false">Статистика</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="tab_4-tab" data-toggle="tab" href="#tab_4" role="tab" aria-controls="tab_4" aria-selected="false">Terminal</a>
     </li>
 </ul>
 <div class="tab-content" id="myTabContent" style="padding: 5px;">
@@ -84,6 +89,24 @@
         }
     </div>
     <div class="tab-pane fade" id="tab_3" role="tabpanel" aria-labelledby="tab_3-tab">
+        @if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Internet && Model.InteractionType == WEB.Models.Enums.InteractionType.Transmit)
+        {
+            //Html.RenderPartial("_WindowsServiceOperations", Model);
+        }
+        else if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Internet && Model.InteractionType == WEB.Models.Enums.InteractionType.Receive)
+        {
+            //Html.RenderPartial("_WindowsClientOperations", Model);
+        }
+        else if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Tunduk && Model.InteractionType == WEB.Models.Enums.InteractionType.Transmit)
+        {
+            Html.RenderPartial("_LineChart");
+        }
+        else if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Tunduk && Model.InteractionType == WEB.Models.Enums.InteractionType.Receive)
+        {
+            Html.RenderPartial("_LineChart");
+        }
+    </div>
+    <div class="tab-pane fade" id="tab_4" role="tabpanel" aria-labelledby="tab_4-tab">
         <div class="col-md-6 terminal">
             <p>terminal >_</p>
             <ul></ul>
@@ -92,6 +115,9 @@
 </div>
 
 @section scripts {
+    <!-- Load d3.js and c3.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js" charset="utf-8"></script>
+    <script src="@Url.Content("~/c3-0.6.8/c3.js")"></script>
     @if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Internet)
     {
         if (Model.InteractionType == WEB.Models.Enums.InteractionType.Transmit)
@@ -304,61 +330,60 @@
         {
             <script>
                 $(function () {
-                    $.ajax({
-                        url: '@Url.Action("CheckProjectFolder", "ServiceBuilder", new { name = Model.Name })',
-                        success: function (result) {
-                            if (result.result) {
-                                $('#createProjectFolderBtn').addClass('disabled').attr('href', '#');
-                                $('.hasProjectFolder').text('Создано').addClass('text-success');
-                                $.ajax({
-                                    url: '@Url.Action("IsPublished", "ServiceBuilder", new { name = Model.Name })',
-                                    success: function (result) {
-                                        if (result.result) {
-                                            $('#publishToPackageBtn').addClass('disabled').attr('href', '#');
-                                            $('.isPublished').text('Опубликовано @("Tunduk" + Model.Name + ".zip")').addClass('text-success');
+                    $(document).delegate('#tab_3-tab', 'click', function (e) {
+                    var line_chart_url = '@Url.Action("GetTransmitHistory", "ReceiveMonitor", new { serviceDetailId = Model.ServiceDetails.Count > 0 ? Model.ServiceDetails.First().Id : 0 })';
+                    $.getJSON(line_chart_url, function (data) {
+                                if (data.result) {
+                                    var dates = ['Date'];
+                                    var totals = ['Total'];
+                                    var errors = ['Error'];
+                                    var successes = ['Success'];
 
-                                            $.ajax({
-                                                url: '@Url.Action("IsDeployed", "ServiceBuilder", new { name = Model.Name })',
-                                                success: function (result) {
-                                                    if (result.result) {
-                                                        var url = result.serviceUrl.replace('localhost', '192.168.2.104');
-                                                        var link = $('<a/>');
-                                                        link.addClass('btn btn-link').text('открыть').attr('href', url).attr('target', '_blank');
-                                                        $('.isDeployed').text('Установлен ').addClass('text-success').append(link);
-                                                    }
+                                    var chart = c3.generate({
+                                        bindto: '#line_chart',
+                                        data: {
+                                            x: 'Date',
+                                            xFormat: '%Y%m%d',
+                                            columns: [
+                                                dates,
+                                                totals,
+                                                errors,
+                                                successes
+                                            ]
+                                        },
+                                        axis: {
+                                            x: {
+                                                type: 'timeseries',
+                                                tick: {
+                                                    //              format : "%m/%d" // https://github.com/mbostock/d3/wiki/Time-Formatting#wiki-format
+                                                    format: "%e %b %y" // https://github.com/mbostock/d3/wiki/Time-Formatting#wiki-format
                                                 }
-                                            });
+                                            }
                                         }
-                                    }
-                                });
-                            }
-                            else {
-                                $('#publishToPackageBtn').addClass('disabled').attr('href', '#');
-                            }
-                        }
-                    });
-                    $(document).delegate('#createProjectFolderBtn, #publishToPackageBtn, #checkDeployBtn, #deployBtn', 'click', function (e) {
-                        e.preventDefault();
-                        var url = $(this).attr('href');
-                        $.ajax({
-                            url: url,
-                            success: function (result) {
-                                if (result.result) {
-                                    $(result.outputLines).each(function (i, item) {
-                                        $('.terminal ul').append($('<li/>').text(item));
                                     });
+                                    setTimeout(function () {
+                                        data.items.forEach(function (item) {
+                                            dates.push(item.Date);
+                                            totals.push(item.Amount.Total);
+                                            errors.push(item.Amount.Error);
+                                            successes.push(item.Amount.Success);
+                                        });
+
+                                        chart.load({
+                                            columns: [
+                                                dates,
+                                                totals,
+                                                errors,
+                                                successes
+                                            ]
+                                        });
+                                    }, 1000);
                                 }
                                 else {
-                                    $(result.outputLines).each(function (i, item) {
-                                        $('.terminal ul').append($('<li/>').text(item));
-                                    });
-                                    $('.terminal ul').append($('<li/>').text(result.error).addClass('error'));
+                                    bs_alert(data.errorMessage);
                                 }
-                                $(".terminal").scrollTop($(".terminal")[0].scrollHeight);
-                            }
-                        });
+                            });
                     });
-
                 });
             </script>
         }
@@ -370,7 +395,7 @@
                     {
                         var soapObj = Model.ClientDetails.First();
                         <text>
-                            var url = '@Url.Action("GetRequiredParams", "SoapClient", new { wsdlUrl = soapObj.WsdlUrl, methodName = soapObj.MethodName })'.replace("&amp;", "&");
+                            var url = '@Url.Action("GetRequiredParams", "SoapClient", new { wsdlUrl = soapObj.ServiceCode.WsdlPath, methodName = soapObj.ServiceCode.Name })'.replace("&amp;", "&");
                             $.getJSON(url, function (data) {
                                 if (data.result) {
                                     setTimeout(function () {
@@ -389,7 +414,62 @@
                                     $('.inputParams img').attr('src', '@Url.Content("~/Content/service-unavailable.png")').removeAttr('width').removeAttr('height');
                                     $('.outputParams img').attr('src', '@Url.Content("~/Content/service-unavailable.png")').removeAttr('width').removeAttr('height');
                                 }
+                    });
+
+                    $(document).delegate('#tab_3-tab', 'click', function (e) {
+                    var line_chart_url = '@Url.Action("GetReceiveHistory", "ReceiveMonitor", new { clientId = soapObj.Id })';
+                    $.getJSON(line_chart_url, function (data) {
+                                if (data.result) {
+                                    var dates = ['Date'];
+                                    var totals = ['Total'];
+                                    var errors = ['Error'];
+                                    var successes = ['Success'];
+
+                                    var chart = c3.generate({
+                                        bindto: '#line_chart',
+                                        data: {
+                                            x: 'Date',
+                                            xFormat: '%Y%m%d',
+                                            columns: [
+                                                dates,
+                                                totals,
+                                                errors,
+                                                successes
+                                            ]
+                                        },
+                                        axis: {
+                                            x: {
+                                                type: 'timeseries',
+                                                tick: {
+                                                    //              format : "%m/%d" // https://github.com/mbostock/d3/wiki/Time-Formatting#wiki-format
+                                                    format: "%e %b %y" // https://github.com/mbostock/d3/wiki/Time-Formatting#wiki-format
+                                                }
+                                            }
+                                        }
+                                    });
+                                    setTimeout(function () {
+                                        data.items.forEach(function (item) {
+                                            dates.push(item.Date);
+                                            totals.push(item.Amount.Total);
+                                            errors.push(item.Amount.Error);
+                                            successes.push(item.Amount.Success);
+                                        });
+
+                                        chart.load({
+                                            columns: [
+                                                dates,
+                                                totals,
+                                                errors,
+                                                successes
+                                            ]
+                                        });
+                                    }, 1000);
+                                }
+                                else {
+                                    bs_alert(data.errorMessage);
+                                }
                             });
+                    });
                         </text>
                     }
                 });
@@ -399,6 +479,8 @@
 }
 
 @section styles {
+    <!-- Load c3.css -->
+    <link href="@Url.Content("~/c3-0.6.8/c3.css")" rel="stylesheet">
     <style>
         .terminal {
             background-color: #1c2544;
@@ -413,4 +495,10 @@
                 font-style: italic;
             }
     </style>
+}
+
+
+@section breadcrumb{
+    <li class="breadcrumb-item">@Html.ActionLink("Список сервисов", "Index")</li>
+    <li class="breadcrumb-item active">@ViewBag.Title</li>
 }

@@ -1,0 +1,191 @@
+﻿@model WEB.Models.RequestByOrgViewModel
+
+@{
+    ViewBag.Title = "Отчеты по организациям";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Выберите нужные параметры и нажмите "Сформировать"</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.StartDate)
+                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.EndDate)
+                @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Сформировать" class="btn btn-outline-primary" /> @Html.ActionLink("Назад", "Index", null, new { @class = "btn btn-outline-secondary" })
+            </div>
+        </div>
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Принятые пакеты данных из внешних источников
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.Name) (из)
+                        </th>
+                        <th>@Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ConnectionName)</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.MemberCode)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ReceivedDataSizeStr)
+                        </th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.Name) (из)
+                        </th>
+                        <th>@Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ConnectionName)</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.MemberCode)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ReceivedDataSizeStr)
+                        </th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model.ReceivedHistoryByOrgs)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Organization.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ConnectionName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Organization.MemberCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ReceivedDataSizeStr)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        Переданные пакеты данных во внешние источники
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ConnectionName)</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.Name) (в)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.MemberCode)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().TransmittedDataSizeStr)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().TransmittedRows)
+                        </th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ConnectionName)</th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.Name) (в)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.MemberCode)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().TransmittedDataSizeStr)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().TransmittedRows)
+                        </th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model.TransmittedHistoryByOrgs)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ConnectionName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Organization.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Organization.MemberCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TransmittedDataSizeStr)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TransmittedRows)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <!-- Page level plugin JavaScript-->
+    <script src="~/dark_theme/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="~/dark_theme/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <script src="~/html_to_xls/js/xlsx.core.min.js"></script>
+    <script src="~/html_to_xls/js/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.0.3/js/tableexport.min.js"></script>
+    
+    <script>
+        $(function () {
+            $('table').DataTable();
+            $("table").tableExport();
+        });
+    </script>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item">@Html.ActionLink("Отчеты-статистика", "Index")</li>
+    <li class="breadcrumb-item active">@ViewBag.Title</li>
+}

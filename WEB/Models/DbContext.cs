@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using WEB.Models.Entities;
 
 namespace WEB.Models
 {
@@ -30,8 +31,13 @@ namespace WEB.Models
             return new ApplicationDbContext();
         }
 
-        public System.Data.Entity.DbSet<WEB.Models.Entities.ServiceDescription> ServiceDescriptions { get; set; }
-        public DbSet<WEB.Models.Entities.ClientDetail> ClientDetails { get; set; }
-        public DbSet<WEB.Models.Entities.ReceiveHistoryItem> ReceiveHistoryItems { get; set; }
+        public DbSet<ServiceDescription> ServiceDescriptions { get; set; }
+        public DbSet<ClientDetail> ClientDetails { get; set; }
+        public DbSet<ReceiveHistoryItem> ReceiveHistoryItems { get; set; }
+        public DbSet<TransmitHistoryItem> TransmitHistoryItems { get; set; }
+        public DbSet<ServiceDetail> ServiceDetails { get; set; }
+        public DbSet<TundukOrganization> TundukOrganizations { get; set; }
+        public DbSet<Subsystem> Subsystems { get; set; }
+        public DbSet<ServiceCode> ServiceCodes { get; set; }
     }
 }

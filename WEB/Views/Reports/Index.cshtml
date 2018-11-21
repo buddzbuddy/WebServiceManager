@@ -1,0 +1,16 @@
+﻿
+@{
+    ViewBag.Title = "Отчеты/Статистика";
+}
+@Html.ActionLink("Отчеты за период", "RequestByPeriod", null, new { @class = "btn btn-primary btn-lg" })
+
+@Html.ActionLink("Отчеты по ведомствам", "RequestByOrg", null, new { @class = "btn btn-primary btn-lg" })
+
+@Html.ActionLink("Отчеты по виду соединения", "RequestByType", null, new { @class = "btn btn-primary btn-lg" })
+
+
+
+
+@section breadcrumb{
+<li class="breadcrumb-item active">Отчеты-статистика</li>
+}

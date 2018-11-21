@@ -1,0 +1,88 @@
+﻿@model WEB.Models.Entities.Subsystem
+
+@{
+    ViewBag.Title = "Добавить Subsystem";
+}
+<dl class="dl-horizontal">
+    <dt>
+        @Html.DisplayNameFor(model => model.TundukOrganization.Name)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.TundukOrganization.Name)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.TundukOrganization.MemberCode)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.TundukOrganization.MemberCode)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.TundukOrganization.MemberClass)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.TundukOrganization.MemberClass)
+    </dd>
+
+    <dt>
+        @Html.DisplayNameFor(model => model.TundukOrganization.XRoadInstance)
+    </dt>
+
+    <dd>
+        @Html.DisplayFor(model => model.TundukOrganization.XRoadInstance)
+    </dd>
+
+</dl>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.TundukOrganizationId)
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.TargetNamespace, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.TargetNamespace, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.TargetNamespace, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.ProtocolVersion, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ProtocolVersion, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ProtocolVersion, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Сохранить" class="btn btn-outline-primary" />
+                @Html.ActionLink("Отмена", "Details", new { id = Model.TundukOrganizationId }, new { @class = "btn btn-outline-secondary" })
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item">@Html.ActionLink("Справочник организаций Tunduk", "Index")</li>
+    <li class="breadcrumb-item">@Html.ActionLink("Просмотр организации", "Details", new { id = Model.TundukOrganizationId })</li>
+    <li class="breadcrumb-item active">@ViewBag.Title</li>
+}

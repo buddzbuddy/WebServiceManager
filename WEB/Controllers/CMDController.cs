@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace WEB.Controllers
 {
+    [Authorize]
     public class CMDController : Controller
     {
         // GET: CMD

@@ -58,7 +58,7 @@ namespace WEB.Controllers
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View();
+            return View("LoginDark");
         }
 
         //
@@ -87,7 +87,7 @@ namespace WEB.Controllers
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
+                    return View("LoginDark", model);
             }
         }
 

@@ -1,28 +1,20 @@
-﻿
-@model WEB.Models.Entities.ServiceDescription
-
+﻿@model WEB.Models.Entities.ServiceDescription
 <div class="row">
-    <div class="col-md-6">
-        <table class="table table-bordered">
-            <tr>
-                <td>@Html.ActionLink("Создать сервис по шаблону", "CreateProjectFolder", "ServiceBuilder", new { name = Model.Name, isTunduk = true }, new { id = "createProjectFolderBtn", @class = "btn btn-default" })</td>
-                <td class="hasProjectFolder"></td>
-            </tr>
-            <tr>
-                <td>@Html.ActionLink("Опубликовать пакет для развертывания", "PublishToPackage", "ServiceBuilder", new { name = Model.Name }, new { id = "publishToPackageBtn", @class = "btn btn-default" })</td>
-                <td class="isPublished"></td>
-            </tr>
-            <tr>
-                <td>
-                    @Html.ActionLink("Проверка установки", "CheckDeploy", "ServiceBuilder", new { name = Model.Name }, new { id = "checkDeployBtn", @class = "btn btn-default" })
-                </td>
-                <td class="isDeployed" rowspan="2" align="center" style="vertical-align: middle"></td>
-            </tr>
-            <tr>
-                <td>
-                    @Html.ActionLink("Установка на сервер", "Deploy", "ServiceBuilder", new { name = Model.Name }, new { id = "deployBtn", @class = "btn btn-default" })
-                </td>
-            </tr>
-        </table>
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Шаг 1.</h5>
+                <p class="card-text">Создать Tunduk-адаптер</p>
+                @if (Model.ServiceDetails.Count > 0)
+                {
+                    <div class="alert alert-success text-right">Выполнено (@Html.DisplayNameFor(modelItem => Model.ServiceDetails.First().ServiceCode.Name)): <span id="s_serviceCode">@Html.DisplayFor(modelItem => Model.ServiceDetails.First().ServiceCode.Name)</span> <a href="javascript://" onclick="copyToClipboard('s_serviceCode')"><i class="fas fa-copy"></i></a>) @Html.ActionLink("Удалить", "DeleteServiceDetails", "ServiceDescriptions", new { id = Model.ServiceDetails.First().Id }, new { id = "deleteServiceDetailsBtn", @class = "btn btn-danger" })</div>
+                    Html.RenderAction("ServiceDetails", new { detailsId = Model.ServiceDetails.First().Id });
+                }
+                else
+                {
+                    <div class="alert alert-dark text-right">@Html.ActionLink("Выполнить", "CreateServiceDetails", "ServiceDescriptions", new { serviceId = Model.Id }, new { id = "createServiceDetailsBtn", @class = "btn btn-primary" })</div>
+                }
+            </div>
+        </div>
     </div>
 </div>
