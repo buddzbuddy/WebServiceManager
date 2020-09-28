@@ -1,34 +1,87 @@
 ﻿@model WEB.Models.Entities.ServiceDescription
 <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-8">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Шаг 1.</h5>
+                <h5 class="card-title">Заполните параметры запроса:</h5>
+                <p class="card-text inputParams text-center soapRequest"><img width="150" height="150" src="~/Content/processing.gif" /></p>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-outline-success sendSoapBtn">ОТПРАВИТЬ (test)</button>
+            </div>
+        </div>
+        <hr />
+        <div class="card soapResponse">
+            <div class="card-body">
+                <h5 class="card-title">Результат: Информация из СФ</h5>
+                <div class="card-text pre-scrollable">
+                    <table class="table table-bordered table-hover table-condensed">
+                        <thead>
+                            <tr>
+                                <th title="Field #1">ПИН</th>
+                                <th title="Field #1">Фамилия</th>
+                                <th title="Field #1">Имя</th>
+                                <th title="Field #1">Отчество</th>
+                                <th title="Field #1">РУСФ</th>
+                                <th title="Field #2">Номер ПД</th>
+                                <th title="Field #3">ПИН пенсионера</th>
+                                <th title="Field #4">ПИН получателя</th>
+                                <th title="Field #5">Дата назначения</th>
+                                <th title="Field #6">Дата завершения</th>
+                                <th title="Field #7">Сумма к выплате пенсии</th>
+                                <th title="Field #8">Вид пенсии</th>
+                                <th title="Field #9">Категория пенсии</th>
+                                <th title="Field #10">ПИН кормильца 1</th>
+                                <th title="Field #11">ПИН кормильца 2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>21411196600831</td>
+                                <td>Румянцева</td>
+                                <td>Людмила</td>
+                                <td>Ивановна</td>
+                                <td align="right">304</td>
+                                <td>A340000760</td>
+                                <td align="right">21411196600831</td>
+                                <td align="right">21411196600831</td>
+                                <td>03.01.1995</td>
+                                <td> </td>
+                                <td align="right">5496.00</td>
+                                <td align="right">По инвалидности</td>
+                                <td align="right">Инвалидность 2-й группы</td>
+                                <td> </td>
+                                <td> </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                @*<p class="card-text text-center">Для того чтобы протестировать запрос воспользуйтесь бесплатной программой Postman (<a target="_blank" href="https://www.getpostman.com/downloads/">скачать</a>)</p>*@
+
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Свойства подключения</h5>
                 <p class="card-text">Сгенерировать клиент</p>
                 @if (Model.ClientDetails.Count > 0)
                 {
-                    <div class="alert alert-success text-right">Выполнено (clientId: <span id="clientId">@Model.ClientDetails.First().Id</span> <a href="javascript://" onclick="copyToClipboard('clientId')"><i class="fas fa-copy"></i></a>) @Html.ActionLink("Удалить", "DeleteClientDetails", "ServiceDescriptions", new { id = Model.ClientDetails.First().Id }, new { id = "deleteClientDetailsBtn", @class = "btn btn-danger" })</div>
+                    <div class="alert alert-success text-right">Выполнено (clientId: <span id="clientId">@Model.ClientDetails.First().Id</span> <a href="javascript://" onclick="copyToClipboard('clientId')"><i class="fas fa-copy"></i></a>)
+                        @if(User.IsInRole("Developer"))
+                        {
+                            @Html.ActionLink("Удалить", "DeleteClientDetails", "ServiceDescriptions", new { id = Model.ClientDetails.First().Id }, new { id = "deleteClientDetailsBtn", @class = "btn btn-danger" })
+                        }
+                    </div>
                     Html.RenderAction("ClientDetails", new { detailsId = Model.ClientDetails.First().Id });
                 }
-                else
+                else if(User.IsInRole("Developer"))
                 {
                     <div class="alert alert-dark text-right">@Html.ActionLink("Выполнить", "CreateClientDetails", "ServiceDescriptions", new { serviceId = Model.Id }, new { id = "createClientDetailsBtn", @class = "btn btn-primary" })</div>
                 }
             </div>
         </div>
     </div>
-    <div class="col-sm-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">InputParams:</h5>
-                <p class="card-text inputParams text-center"><img width="150" height="150" src="~/Content/processing.gif" /></p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Output params</h5>
-                <p class="card-text outputParams text-center"><img width="150" height="150" src="~/Content/processing.gif" /></p>
-            </div>
-        </div>
-    </div>
+
 </div>

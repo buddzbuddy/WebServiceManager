@@ -209,7 +209,7 @@ namespace WEB.SOAP
                                         InitComplexType(complexType, parameterName, parameters, parameter);
                                     }
                                     else
-                                        throw new ApplicationException(string.Format("ComplexType not found. childElement: {0}, childElement.SchemaTypeName: {1}", childElement.Name, childElement.SchemaTypeName));
+                                        throw new ApplicationException(string.Format("InitElement1: ComplexType not found. childElement: {0}, childElement.SchemaTypeName: {1}", childElement.Name, childElement.SchemaTypeName));
                                 }
                                 else
                                 {
@@ -217,6 +217,23 @@ namespace WEB.SOAP
                                 }
                             }
                         }
+                    }
+                    else if (schemaElement.SchemaTypeName.Namespace == tns && schemaElement.SchemaTypeName != null)
+                    {
+                        var linkedType = types.Schemas.Find(schemaElement.SchemaTypeName, typeof(XmlSchemaComplexType));
+                        if (linkedType != null)
+                            InitComplexType((XmlSchemaComplexType)linkedType, messagePartName, parameters, parent);
+                        else //SimpleType
+                        {
+                            string parameterName = schemaElement.Name;
+                            string parameterType = "string";
+
+                            var parameter = new Parameter(parameterName, parameterType, parent);
+                            if (parent == null)
+                                parameters.Add(parameter);
+                        }
+                        //else
+                            //throw new ApplicationException(string.Format("InitElement2: ComplexType not found. childElement: {0}, childElement.SchemaTypeName: {1}", schemaElement.Name, schemaElement.SchemaTypeName));
                     }
                 }
             }
@@ -249,13 +266,21 @@ namespace WEB.SOAP
                         {
                             InitComplexType(childComplexType, parameterName, parameters, parent);
                         }
-                        else
-                            throw new ApplicationException(string.Format("ComplexType not found. childElement: {0}, childElement.SchemaTypeName: {1}", childElement.Name, childElement.SchemaTypeName));
+                        else//SimpleType
+                        {
+                            parameterType = "string";
+                            var parameter = new Parameter(parameterName, parameterType, parent);
+                            InitElement(childElement, parameterName, parameters, parameter);
+                        }
+                        //else
+                        //throw new ApplicationException(string.Format("InitComplexType: ComplexType not found. childElement: {0}, childElement.SchemaTypeName: {1}", childElement.Name, childElement.SchemaTypeName));
                     }
                     else
                     {
                         var parameter = new Parameter(parameterName, parameterType, parent);
-                        InitElement(childElement, parameterName, parameters, parameter);
+                        if (parent == null)
+                            parameters.Add(parameter);
+                        //InitElement(childElement, parameterName, parameters, parameter);
                     }
                 }
             }

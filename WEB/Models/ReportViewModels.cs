@@ -93,50 +93,21 @@ namespace WEB.Models
     }
     public class RequestByOrgItem
     {
-        [Display(Name = "Подключение")]
+        [Display(Name = "Сервис")]
         public string ConnectionName { get; set; }
 
         public TundukOrganization Organization { get; set; }
 
-        public double _ReceivedDataSize { get; set; }
-        [Display(Name = "Размер принятых данных")]
-        public string ReceivedDataSizeStr
-        {
-            get
-            {
-                var KB = _ReceivedDataSize / 1024;
-                string size = "";
-                if (KB > 1024)
-                {
-                    var MB = KB / 1024;
-                    size = Math.Round(MB, 1).ToString() + " MB";
-                }
-                else
-                    size = Math.Round(KB, 1).ToString() + " KB";
-                return size;
-            }
-        }
+        [Display(Name = "Подразделение")]
+        public string OrgName { get; set; }
 
-        public double _TransmittedDataSize { get; set; }
-        [Display(Name = "Размер переданных данных")]
-        public string TransmittedDataSizeStr
-        {
-            get
-            {
-                var KB = _TransmittedDataSize / 1024;
-                string size = "";
-                if (KB > 1024)
-                {
-                    var MB = KB / 1024;
-                    size = Math.Round(MB, 1).ToString() + " MB";
-                }
-                else
-                    size = Math.Round(KB, 1).ToString() + " KB";
-                return size;
-            }
-        }
-        [Display(Name = "Кол-во переданных данных (шт.)")]
-        public int TransmittedRows { get; set; }
+        [Display(Name = "Область")]
+        public string Region { get; set; }
 
+        [Display(Name = "Кол-во запросов отправлено")]
+        public int SentRequests { get; set; }
+
+        [Display(Name = "Кол-во запросов принято")]
+        public int ReceivedRequests { get; set; }
     }
 }

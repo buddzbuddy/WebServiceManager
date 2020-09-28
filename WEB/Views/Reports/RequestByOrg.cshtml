@@ -35,11 +35,14 @@
         </div>
     </div>
 }
-
+@if (ViewBag.DateFromStr != null)
+{
+    <h3>Выбран период: с @ViewBag.DateFromStr по @ViewBag.DateToStr</h3>
+}
 <div class="card mb-3">
     <div class="card-header">
         <i class="fas fa-table"></i>
-        Принятые пакеты данных из внешних источников
+        Статистика отправленных запросов во внешние источники
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -51,10 +54,13 @@
                         </th>
                         <th>@Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ConnectionName)</th>
                         <th>
-                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.MemberCode)
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().OrgName)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ReceivedDataSizeStr)
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Region)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().SentRequests)
                         </th>
                     </tr>
                 </thead>
@@ -65,10 +71,13 @@
                         </th>
                         <th>@Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ConnectionName)</th>
                         <th>
-                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.MemberCode)
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().OrgName)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ReceivedDataSizeStr)
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Region)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().SentRequests)
                         </th>
                     </tr>
                 </tfoot>
@@ -83,10 +92,13 @@
                                 @Html.DisplayFor(modelItem => item.ConnectionName)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Organization.MemberCode)
+                                @Html.DisplayFor(modelItem => item.OrgName)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.ReceivedDataSizeStr)
+                                @Html.DisplayFor(modelItem => item.Region)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SentRequests)
                             </td>
                         </tr>
                     }
@@ -100,7 +112,7 @@
 <div class="card mb-3">
     <div class="card-header">
         <i class="fas fa-table"></i>
-        Переданные пакеты данных во внешние источники
+        Статистика принятых запросов из внешних источников
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -115,10 +127,7 @@
                             @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.MemberCode)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().TransmittedDataSizeStr)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().TransmittedRows)
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ReceivedRequests)
                         </th>
                     </tr>
                 </thead>
@@ -132,10 +141,7 @@
                             @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().Organization.MemberCode)
                         </th>
                         <th>
-                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().TransmittedDataSizeStr)
-                        </th>
-                        <th>
-                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().TransmittedRows)
+                            @Html.DisplayNameFor(model => model.ReceivedHistoryByOrgs.First().ReceivedRequests)
                         </th>
                     </tr>
                 </tfoot>
@@ -153,10 +159,7 @@
                                 @Html.DisplayFor(modelItem => item.Organization.MemberCode)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.TransmittedDataSizeStr)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.TransmittedRows)
+                                @Html.DisplayFor(modelItem => item.ReceivedRequests)
                             </td>
                         </tr>
                     }
@@ -176,10 +179,12 @@
     <script src="~/html_to_xls/js/xlsx.core.min.js"></script>
     <script src="~/html_to_xls/js/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.0.3/js/tableexport.min.js"></script>
-    
+
     <script>
         $(function () {
-            $('table').DataTable();
+            $('table').DataTable({
+                pageLength: 5000
+            });
             $("table").tableExport();
         });
     </script>

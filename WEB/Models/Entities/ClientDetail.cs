@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace WEB.Models.Entities
 {
@@ -20,5 +21,11 @@ namespace WEB.Models.Entities
         [Required]
         public int? ServiceCodeId { get; set; }
         public virtual ServiceCode ServiceCode { get; set; }
+
+        [Required]
+        [Display(Name = "Шаблон XML из SoapUI")]
+        [DataType(DataType.MultilineText)]
+        [AllowHtml]
+        public string RequestXML { get; set; }
     }
 }

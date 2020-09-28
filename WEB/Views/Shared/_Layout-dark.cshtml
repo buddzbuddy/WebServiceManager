@@ -97,31 +97,34 @@
                 </a>
             </li>
             <li class="nav-item @ViewBag.ReportsNav">
-                <a class="nav-link" href="@Url.Action("Index", "Reports")">
+                <a class="nav-link" href="@Url.Action("RequestByOrg", "Reports")">
                     <i class="fas fa-fw fa-chart-area"></i>
                     <span>Отчеты-статистика</span>
                 </a>
             </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-fw fa-folder"></i>
-                    <span>Справочники</span>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-                    <h6 class="dropdown-header">Тундук:</h6>
-                    <a class="dropdown-item" href="@Url.Action("Index", "TundukOrganizations")">Организации</a>
-                </div>
-                @*<div class="dropdown-menu" aria-labelledby="pagesDropdown">
-            <h6 class="dropdown-header">Login Screens:</h6>
-            <a class="dropdown-item" href="@Url.Content("~/dark_theme/login.html")">Login</a>
-            <a class="dropdown-item" href="@Url.Content("~/dark_theme/register.html")">Register</a>
-            <a class="dropdown-item" href="@Url.Content("~/dark_theme/forgot-password.html")">Forgot Password</a>
-            <div class="dropdown-divider"></div>
-            <h6 class="dropdown-header">Other Pages:</h6>
-            <a class="dropdown-item" href="@Url.Content("~/dark_theme/404.html")">404 Page</a>
-            <a class="dropdown-item" href="@Url.Content("~/dark_theme/blank.html")">Blank Page</a>
-        </div>*@
-            </li>
+            @if (User.IsInRole("Developer"))
+            {
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-fw fa-folder"></i>
+                        <span>Справочники</span>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+                        <h6 class="dropdown-header">Тундук:</h6>
+                        <a class="dropdown-item" href="@Url.Action("Index", "TundukOrganizations")">Организации</a>
+                    </div>
+                    @*<div class="dropdown-menu" aria-labelledby="pagesDropdown">
+                    <h6 class="dropdown-header">Login Screens:</h6>
+                    <a class="dropdown-item" href="@Url.Content("~/dark_theme/login.html")">Login</a>
+                    <a class="dropdown-item" href="@Url.Content("~/dark_theme/register.html")">Register</a>
+                    <a class="dropdown-item" href="@Url.Content("~/dark_theme/forgot-password.html")">Forgot Password</a>
+                    <div class="dropdown-divider"></div>
+                    <h6 class="dropdown-header">Other Pages:</h6>
+                    <a class="dropdown-item" href="@Url.Content("~/dark_theme/404.html")">404 Page</a>
+                    <a class="dropdown-item" href="@Url.Content("~/dark_theme/blank.html")">Blank Page</a>
+                </div>*@
+                </li>
+            }
         </ul>
         <div id="content-wrapper">
             <div class="container-fluid">
@@ -212,8 +215,8 @@
             $('[data-toggle="tooltip"]').tooltip();
 
             $(".bs_datepicker").datepicker({
-                //format: "dd.mm.yyyy",
-                //language: "ru",
+                format: "yyyy-mm-dd",
+                language: "ru",
                 todayHighlight: true,
                 clearBtn: true
             });

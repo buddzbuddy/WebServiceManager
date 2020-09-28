@@ -10,7 +10,7 @@ using WEB.Models.Entities;
 namespace WEB.Controllers
 {
     [Authorize]
-    public class ReceiveMonitorController : Controller
+    public class HistoryMonitorController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         // GET: ReceiveMonitor
@@ -88,5 +88,20 @@ namespace WEB.Controllers
                 return Json(new { result = false, errorMessage = e.GetBaseException().Message }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public ActionResult AllHistoryReceive()
+        {
+            var receiveQuery = db.ReceiveHistoryItems.AsQueryable().OrderByDescending(x => x.Id).Take(20);
+            //if(withErrors)
+            return View(receiveQuery.ToList());
+        }
+
+        public ActionResult AllHistoryTransmit()
+        {
+            var transmitQuery = db.TransmitHistoryItems.AsQueryable().OrderByDescending(x => x.Id).Take(20);
+            //if(withErrors)
+            return View(transmitQuery.ToList());
+        }
+
     }
 }

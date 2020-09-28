@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 
 namespace WEB.SOAP.Clients
 {
-    public static class SOAPClient
+    public class SOAPClient
     {
 
         [XmlRoot(Namespace = "http://schemas.xmlsoap.org/soap/envelope/", ElementName = "Envelope")]
@@ -65,7 +65,7 @@ namespace WEB.SOAP.Clients
                 public object Content { get; set; }
             }
         }
-        static void RetrieveSOAPResponse<T>(T obj, string tab = "")
+        void RetrieveSOAPResponse<T>(T obj, string tab = "")
         {
             Console.WriteLine("--->");
             foreach (var property in typeof(T).GetProperties())
@@ -82,7 +82,7 @@ namespace WEB.SOAP.Clients
             Console.WriteLine("<---");
         }
 
-        public static bool GetRequiredParams(string wsdlUrl, string methodName, out List<Parameter> inputParams, out List<Parameter> outputParams, out string errorMessage)
+        public bool GetRequiredParams(string wsdlUrl, string methodName, out List<Parameter> inputParams, out List<Parameter> outputParams, out string errorMessage)
         {
             inputParams = new List<Parameter>();
             outputParams = new List<Parameter>();
@@ -109,7 +109,7 @@ namespace WEB.SOAP.Clients
                 return false;
             }
         }
-        static void CreateSoapParams(XmlDocument document, XmlElement xmlSoapParam, List<Parameter> parameters, Dictionary<string, object> paramList, string tns)
+        void CreateSoapParams(XmlDocument document, XmlElement xmlSoapParam, List<Parameter> parameters, Dictionary<string, object> paramList, string tns)
         {
             foreach (var p in parameters)
             {
@@ -137,7 +137,7 @@ namespace WEB.SOAP.Clients
                     throw new ArgumentNullException("The param of '" + p.Name + "' doesn't exist in the given paramList");
             }
         }
-        public static bool Execute(Dictionary<string, object> inputParams, string tns, string serviceUrl, string wsdlUrl, string methodName, SOAPEnvelope soap_request, out SOAPEnvelope soap_response, out string errorMessage)
+        public bool Execute(Dictionary<string, object> inputParams, string tns, string serviceUrl, string wsdlUrl, string methodName, SOAPEnvelope soap_request, out SOAPEnvelope soap_response, out string errorMessage)
         {
             errorMessage = "";
             soap_response = new SOAPEnvelope();
@@ -179,7 +179,34 @@ namespace WEB.SOAP.Clients
                 return false;
             }
         }
-        public static XmlDocument SerializeToXmlDocument(object input)
+        public bool ExecuteXML(string serviceUrl, XmlDocument soap_request, out XmlDocument soap_response, out string errorMessage)
+        {
+            errorMessage = "";
+            soap_response = new XmlDocument();
+            try
+            {
+                HttpWebRequest request = CreateWebRequest(serviceUrl);
+                
+                using (Stream stream = request.GetRequestStream())
+                {
+                    soap_request.Save(stream);
+                    using (WebResponse response = request.GetResponse())
+                    {
+                        using (StreamReader rd = new StreamReader(response.GetResponseStream()))
+                        {
+                            soap_response.Load(rd);
+                        }
+                    }
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                errorMessage = string.Format("{0}({2}), {1}", e.GetBaseException().Message, e.StackTrace, serviceUrl);
+                return false;
+            }
+        }
+        public XmlDocument SerializeToXmlDocument(object input)
         {
             XmlSerializer ser = new XmlSerializer(input.GetType());
 
@@ -207,7 +234,7 @@ namespace WEB.SOAP.Clients
 
             return xd;
         }
-        public static HttpWebRequest CreateWebRequest(string serviceUrl)
+        public HttpWebRequest CreateWebRequest(string serviceUrl)
         {
             if (string.IsNullOrEmpty(serviceUrl))
                 serviceUrl = System.Configuration.ConfigurationManager.AppSettings["TUNDUK_HOST"];

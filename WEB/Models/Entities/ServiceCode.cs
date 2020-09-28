@@ -20,7 +20,7 @@ namespace WEB.Models.Entities
         public string Name { get; set; }
 
         [Display(Name = "ServiceVersion")]
-        [Required]
+        //[Required]
         public string Version { get; set; } = "v1";
 
         [NotMapped]
@@ -41,7 +41,8 @@ namespace WEB.Models.Entities
                     }
                     parameters["subsystemCode"] = Subsystem.Name;
                     parameters["serviceCode"] = Name;
-                    parameters["version"] = Version;
+                    if (!string.IsNullOrEmpty(Version))
+                        parameters["version"] = Version;
                     uriBuilder.Query = parameters.ToString();
                 }
                 return uriBuilder.Uri.AbsoluteUri;

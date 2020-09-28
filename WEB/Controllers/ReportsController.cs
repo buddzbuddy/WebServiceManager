@@ -166,13 +166,19 @@ namespace WEB.Controllers
                 var orgReceiveHistoryQuery = receiveHistoryQuery.Where(x => x.Client.ServiceCode.Subsystem.TundukOrganization.MemberCode == orgCode);
                 foreach(var conName in orgReceiveHistoryQuery.Select(x => x.Client.ServiceDescription.Name).Distinct().ToList())
                 {
-                    var item = new RequestByOrgItem
+                    var connRequests = orgReceiveHistoryQuery.Where(x => x.Client.ServiceDescription.Name == conName);
+                    foreach (var consumer in connRequests.GroupBy(x => x.OrgName ?? "-"))
                     {
-                        ConnectionName = conName,
-                        Organization = org,
-                        _ReceivedDataSize = orgReceiveHistoryQuery.Where(x => x.Client.ServiceDescription.Name == conName).Sum(x => x.OutputSize) ?? 0
-                    };
-                    model.ReceivedHistoryByOrgs.Add(item);
+                        var item = new RequestByOrgItem
+                        {
+                            ConnectionName = conName,
+                            Organization = org,
+                            OrgName = consumer.Key,
+                            SentRequests = consumer.Count(),
+                            Region = consumer.First().Region
+                        };
+                        model.ReceivedHistoryByOrgs.Add(item);
+                    }
                 }
             }
 
@@ -193,12 +199,16 @@ namespace WEB.Controllers
                     {
                         ConnectionName = conName,
                         Organization = org,
-                        _TransmittedDataSize = orgTransmitHistoryQuery.ToList().Where(x => (x.ServiceDetail != null && x.ServiceDetail.ServiceCode.Name == conName) || (x.ErrorMessage == conName)).Sum(x => x.OutputSize) ?? 0,
-                        TransmittedRows = orgTransmitHistoryQuery.ToList().Where(x => (x.ServiceDetail != null && x.ServiceDetail.ServiceCode.Name == conName) || (x.ErrorMessage == conName)).Sum(x => x.OutputRows) ?? 0
+                        ReceivedRequests = orgTransmitHistoryQuery.ToList().Where(x => (x.ServiceDetail != null && x.ServiceDetail.ServiceCode.Name == conName) || (x.ErrorMessage == conName)).Count()
                     };
                     model.TransmittedHistoryByOrgs.Add(item);
                 }
             }
+
+            ViewBag.DateFromStr = model.StartDate?.ToString("yyyy-MM-dd");
+            ViewBag.DateToStr = model.EndDate?.ToString("yyyy-MM-dd");
+            model.StartDate = null;
+            model.EndDate = null;
             return View(model);
         }
     }

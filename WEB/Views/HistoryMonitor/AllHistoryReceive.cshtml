@@ -1,0 +1,122 @@
+﻿@model IEnumerable<WEB.Models.Entities.ReceiveHistoryItem>
+
+@{
+    ViewBag.Title = "История поступающих данных";
+}
+<div class="card mb-3">
+    <div class="card-header">
+        <i class="fas fa-table"></i>
+        @ViewBag.Title
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Client.ServiceCode.Name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.OrgName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.EntryTime)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.OperationDuration)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.IsSuccess)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ErrorMessage)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.InputSize)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.OutputSize)
+                        </th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Client.ServiceCode.Name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.OrgName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.EntryTime)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.OperationDuration)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.IsSuccess)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ErrorMessage)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.InputSize)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.OutputSize)
+                        </th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Client.ServiceCode.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrgName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EntryTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OperationDuration)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IsSuccess)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ErrorMessage)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.InputSize)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OutputSize)
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+</div>
+
+@section scripts
+{
+    <!-- Page level plugin JavaScript-->
+    <script src="~/dark_theme/vendor/datatables/jquery.dataTables.js"></script>
+    <script src="~/dark_theme/vendor/datatables/dataTables.bootstrap4.js"></script>
+
+    <script>
+        $(function () {
+            $('table').DataTable();
+        });
+    </script>
+}
+
+@section breadcrumb{
+    <li class="breadcrumb-item active">@ViewBag.Title</li>
+}

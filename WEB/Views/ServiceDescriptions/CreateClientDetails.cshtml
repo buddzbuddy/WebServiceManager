@@ -28,6 +28,14 @@
         </div>
 
         <div class="form-group">
+            @Html.LabelFor(model => model.RequestXML, "RequestXML", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.RequestXML, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.RequestXML, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Сохранить" class="btn btn-outline-primary" />
                 @Html.ActionLink("Отмена", "Details", new { id = Model.ServiceDescriptionId }, new { @class = "btn btn-outline-secondary" })

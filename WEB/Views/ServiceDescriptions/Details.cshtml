@@ -64,11 +64,13 @@
             </dd>
 
         </dl>
-        <p>
-            @Html.ActionLink("Редактировать (restricted)", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" }) |
-            @Html.ActionLink("Удалить (restricted)", "Delete", new { id = Model.Id }, new { @class = "btn btn-danger" }) |
-            @Html.ActionLink("Назад к списку", "Index")
-        </p>
+        @if (User.IsInRole("Developer"))
+        {
+            <p>
+                @Html.ActionLink("Редактировать (restricted)", "Edit", new { id = Model.Id }, new { @class = "btn btn-warning" }) |
+                @Html.ActionLink("Удалить (restricted)", "Delete", new { id = Model.Id }, new { @class = "btn btn-danger" })
+            </p>
+        }
     </div>
     <div class="tab-pane fade" id="tab_2" role="tabpanel" aria-labelledby="tab_2-tab">
         @if (Model.ConnectionType == WEB.Models.Enums.ConnectionType.Internet && Model.InteractionType == WEB.Models.Enums.InteractionType.Transmit)
@@ -331,7 +333,7 @@
             <script>
                 $(function () {
                     $(document).delegate('#tab_3-tab', 'click', function (e) {
-                    var line_chart_url = '@Url.Action("GetTransmitHistory", "ReceiveMonitor", new { serviceDetailId = Model.ServiceDetails.Count > 0 ? Model.ServiceDetails.First().Id : 0 })';
+                    var line_chart_url = '@Url.Action("GetTransmitHistory", "HistoryMonitor", new { serviceDetailId = Model.ServiceDetails.Count > 0 ? Model.ServiceDetails.First().Id : 0 })';
                     $.getJSON(line_chart_url, function (data) {
                                 if (data.result) {
                                     var dates = ['Date'];
@@ -395,29 +397,30 @@
                     {
                         var soapObj = Model.ClientDetails.First();
                         <text>
-                            var url = '@Url.Action("GetRequiredParams", "SoapClient", new { wsdlUrl = soapObj.ServiceCode.WsdlPath, methodName = soapObj.ServiceCode.Name })'.replace("&amp;", "&");
+                            var url = '@Url.Action("GetRequiredParams2", "SoapClient", new { clientId = Model.ClientDetails.First().Id, methodName = soapObj.ServiceCode.Name })'.replace("&amp;", "&");
+                            var clientId = '@Model.ClientDetails.First().Id';
                             $.getJSON(url, function (data) {
                                 if (data.result) {
-                                    setTimeout(function () {
-                                        var tmpl1 = $('<textarea id="inputParams" style="color:green;width: 100%;max-width:100%;height:300px"></textarea>');
-                                        $('.inputParams').html(tmpl1);
-                                        tmpl1.html(JSON.stringify(data.inputParams, undefined, 4));
-                                        setTimeout(function () {
-                                            var tmpl2 = $('<textarea id="outputParams" style="color:green;width: 100%;max-width:100%;height:300px"></textarea>');
-                                            $('.outputParams').html(tmpl2);
-                                            tmpl2.html(JSON.stringify(data.outputParams, undefined, 4));
-                                        }, 0);
-                                    }, 0);
+                                    var tmpl1 = $('<textarea id="inputParams" style="color:green;width: 100%;max-width:100%;height:300px"></textarea>');
+                                    $('.inputParams').html(tmpl1);
+                                    var req_json = {
+                                        clientId,
+                                        orgName: '?',
+                                        request: JSON.parse(data.inputParams)
+                                    };
+                                    tmpl1.html(JSON.stringify(req_json, undefined, 4));
                                 }
                                 else {
                                     bs_alert(data.errorMessage);
                                     $('.inputParams img').attr('src', '@Url.Content("~/Content/service-unavailable.png")').removeAttr('width').removeAttr('height');
-                                    $('.outputParams img').attr('src', '@Url.Content("~/Content/service-unavailable.png")').removeAttr('width').removeAttr('height');
                                 }
                     });
-
+                    $('.soapResponse').fadeOut();
+                    $(document).delegate('.sendSoapBtn', 'click', function (e) {
+                        $('.soapResponse').fadeOut().fadeIn(300);
+                    });
                     $(document).delegate('#tab_3-tab', 'click', function (e) {
-                    var line_chart_url = '@Url.Action("GetReceiveHistory", "ReceiveMonitor", new { clientId = soapObj.Id })';
+                    var line_chart_url = '@Url.Action("GetReceiveHistory", "HistoryMonitor", new { clientId = soapObj.Id })';
                     $.getJSON(line_chart_url, function (data) {
                                 if (data.result) {
                                     var dates = ['Date'];
